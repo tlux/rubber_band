@@ -1,5 +1,8 @@
 # Elastix
 
+[![Build Status](https://travis-ci.org/tlux/elastix.svg?branch=master)](https://travis-ci.org/tlux/elastix)
+[![Hex.pm](https://img.shields.io/hexpm/v/elastix.svg)](https://hex.pm/packages/elastix)
+
 An Elixir library to manage your Elasticsearch indices with ease.
 
 ## Installation
