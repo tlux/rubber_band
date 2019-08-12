@@ -1,2 +1,0 @@
-defmodule ElastixTest do
-end

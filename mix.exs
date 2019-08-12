@@ -1,9 +1,11 @@
-defmodule Elastix.MixProject do
+defmodule RubberBand.MixProject do
+  @moduledoc false
+
   use Mix.Project
 
   def project do
     [
-      app: :elastix,
+      app: :rubberband,
       version: "0.1.0",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
@@ -20,8 +22,8 @@ defmodule Elastix.MixProject do
       # Docs
       name: "App Monitoring",
       source_url:
-        "https://github.com/tlux/elastix/blob/master/%{path}#L%{line}",
-      homepage_url: "https://github.com/tlux/elastix",
+        "https://github.com/tlux/rubberband/blob/master/%{path}#L%{line}",
+      homepage_url: "https://github.com/tlux/rubberband",
       docs: [
         main: "readme",
         extras: ["README.md"],
