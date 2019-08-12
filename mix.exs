@@ -10,6 +10,8 @@ defmodule RubberBand.MixProject do
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env()),
+      aliases: aliases(),
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
@@ -47,8 +49,21 @@ defmodule RubberBand.MixProject do
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:excoveralls, "~> 0.10", only: :test},
       {:jason, "~> 1.1", optional: true},
-      {:mox, "~> 0.5", only: :test},
-      {:plug, "~> 1.7"}
+      {:mox, "~> 0.5", only: :test}
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
+  defp aliases do
+    [
+      ci: [
+        "format --check-formatted",
+        "credo --strict",
+        "dialyzer --halt-exit-status",
+        "test --cover"
+      ]
     ]
   end
 end
