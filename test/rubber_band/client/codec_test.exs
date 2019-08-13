@@ -5,7 +5,7 @@ defmodule RubberBand.Client.CodecTest do
 
   alias RubberBand.Client.Codec
   alias RubberBand.Client.CodecError
-  alias RubberBand.Config
+  alias RubberBand.Client.Config
 
   setup :verify_on_exit!
 

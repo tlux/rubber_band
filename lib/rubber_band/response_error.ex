@@ -4,18 +4,18 @@ defmodule RubberBand.ResponseError do
   """
 
   @type t :: %__MODULE__{
-          body: %{optional(atom) => any},
-          type: String.t(),
-          reason: String.t(),
-          line: nil | non_neg_integer,
           col: nil | non_neg_integer,
-          status_code: term
+          data: nil | %{optional(atom) => any},
+          line: nil | non_neg_integer,
+          reason: any,
+          status_code: term,
+          type: nil | String.t()
         }
 
-  defexception [:body, :type, :reason, :line, :col, :status_code]
+  defexception [:data, :col, :line, :reason, :status_code, :type]
 
   @impl true
   def message(%__MODULE__{} = error) do
-    "Search error: #{error.type} (#{error.reason})"
+    "Response error: #{error.reason} (#{error.type})"
   end
 end

@@ -4,18 +4,18 @@ defmodule RubberBand.Response do
   """
 
   @type t :: %__MODULE__{
-          status_code: term,
-          body: %{optional(atom) => any}
+          data: %{optional(atom) => any},
+          status_code: term
         }
 
-  defstruct [:status_code, :body]
+  defstruct [:data, :status_code]
 
   @doc """
   Gets the hits from the response.
   """
   @spec hits(t) :: [map]
   def hits(%__MODULE__{} = response) do
-    response.body
+    response.data
     |> get_in([:hits, :hits])
     |> List.wrap()
   end

@@ -1,10 +1,10 @@
-defmodule RubberBand.Clients.HTTPoison do
+defmodule RubberBand.Drivers.HTTPoison do
   @moduledoc """
   An adapter implementation that uses HTTPoison to do HTTP requests to
   Elasticsearch.
   """
 
-  @behaviour RubberBand.Client
+  @behaviour RubberBand.Driver
 
   @impl true
   def request(verb, url, body, headers, opts) do
