@@ -228,8 +228,6 @@ defmodule RubberBand.ClientTest do
     test "encode error" do
       verb = :post
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       req_data = {:some, :undecodable, "data"}
 
       assert {:error, %CodecError{data: req_data, operation: :encode}} =
@@ -341,8 +339,6 @@ defmodule RubberBand.ClientTest do
     test "encode error" do
       verb = :post
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       req_data = {:some, :undecodable, "data"}
 
       assert_raise CodecError, "Unable to encode data", fn ->

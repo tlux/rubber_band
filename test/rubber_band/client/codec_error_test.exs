@@ -3,15 +3,21 @@ defmodule RubberBand.Client.CodecErrorTest do
 
   alias RubberBand.Client.CodecError
 
+  @error %CodecError{operation: :decode}
+
+  test "raiseable" do
+    assert_raise CodecError, fn ->
+      raise @error
+    end
+  end
+
   describe "message/1" do
     test "decode error" do
-      error = %CodecError{operation: :decode}
-
-      assert CodecError.message(error) == "Unable to decode data"
+      assert CodecError.message(@error) == "Unable to decode data"
     end
 
     test "encode error" do
-      error = %CodecError{operation: :encode}
+      error = %{@error | operation: :encode}
 
       assert CodecError.message(error) == "Unable to encode data"
     end

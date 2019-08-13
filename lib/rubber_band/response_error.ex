@@ -12,7 +12,14 @@ defmodule RubberBand.ResponseError do
           type: nil | String.t()
         }
 
-  defexception [:data, :col, :line, :reason, :status_code, :type]
+  defexception [
+    :col,
+    :data,
+    :line,
+    :reason,
+    :status_code,
+    :type
+  ]
 
   @impl true
   def message(%__MODULE__{} = error) do
