@@ -7,6 +7,10 @@ defmodule RubberBand.Client.URLBuilder do
   @spec build_url(Config.t(), nil | String.t() | [String.t()]) :: URI.t()
   def build_url(config, path_or_segments)
 
+  def build_url(%{base_url: nil}, _path_or_segments) do
+    raise ArgumentError, "Missing base URL"
+  end
+
   def build_url(config, nil), do: URI.parse(config.base_url)
 
   def build_url(config, []), do: URI.parse(config.base_url)
@@ -17,9 +21,11 @@ defmodule RubberBand.Client.URLBuilder do
     %{base_url | path: join_path_segments(base_path_segments ++ path_segments)}
   end
 
-  def build_url(config, path) do
+  def build_url(config, path) when is_binary(path) do
     build_url(config, split_path(path))
   end
+
+  defp split_path(nil), do: []
 
   defp split_path(path) do
     String.split(path, @separator, trim: true)
