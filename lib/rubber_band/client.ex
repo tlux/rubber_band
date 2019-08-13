@@ -1,7 +1,7 @@
 defmodule RubberBand.Client do
   @moduledoc """
-  A low-level adapter that allows plugging different HTTP adapters into the
-  Elasticsearch API.
+  A low-level client that provides functions to retrieve and manage data from
+  Elasticsearch.
   """
 
   alias RubberBand.Client.CodecError
@@ -19,11 +19,17 @@ defmodule RubberBand.Client do
 
   @type error :: CodecError.t() | RequestError.t() | ResponseError.t()
 
+  @callback request(verb :: Driver.verb(), path :: String.t()) ::
+              {:ok, Response.t()} | {:error, error}
+
   @callback request(
               verb :: Driver.verb(),
               path :: String.t(),
               req_data
             ) :: {:ok, Response.t()} | {:error, error}
+
+  @callback request!(verb :: Driver.verb(), path :: String.t()) ::
+              Response.t() | no_return
 
   @callback request!(
               verb :: Driver.verb(),
@@ -40,13 +46,22 @@ defmodule RubberBand.Client do
 
   @callback get!(path :: String.t()) :: Response.t() | no_return
 
+  @callback post(path :: String.t()) ::
+              {:ok, Response.t()} | {:error, error}
+
   @callback post(path :: String.t(), req_data) ::
               {:ok, Response.t()} | {:error, error}
 
+  @callback post!(path :: String.t()) :: Response.t() | no_return
+
   @callback post!(path :: String.t(), req_data) :: Response.t() | no_return
+
+  @callback put(path :: String.t()) :: {:ok, Response.t()} | {:error, error}
 
   @callback put(path :: String.t(), req_data) ::
               {:ok, Response.t()} | {:error, error}
+
+  @callback put!(path :: String.t()) :: Response.t() | no_return
 
   @callback put!(path :: String.t(), req_data) :: Response.t() | no_return
 
@@ -98,23 +113,23 @@ defmodule RubberBand.Client do
       end
 
       @impl true
-      def post(verb, path, req_path \\ %{}) do
-        unquote(__MODULE__).post(__config__(), verb, path, req_path)
+      def post(path, req_path \\ %{}) do
+        unquote(__MODULE__).post(__config__(), path, req_path)
       end
 
       @impl true
-      def post!(verb, path, req_path \\ %{}) do
-        unquote(__MODULE__).post!(__config__(), verb, path, req_path)
+      def post!(path, req_path \\ %{}) do
+        unquote(__MODULE__).post!(__config__(), path, req_path)
       end
 
       @impl true
-      def put(verb, path, req_path \\ %{}) do
-        unquote(__MODULE__).put(__config__(), verb, path, req_path)
+      def put(path, req_path \\ %{}) do
+        unquote(__MODULE__).put(__config__(), path, req_path)
       end
 
       @impl true
-      def put!(verb, path, req_path \\ %{}) do
-        unquote(__MODULE__).put!(__config__(), verb, path, req_path)
+      def put!(path, req_path \\ %{}) do
+        unquote(__MODULE__).put!(__config__(), path, req_path)
       end
 
       @impl true
