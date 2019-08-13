@@ -1,7 +1,7 @@
 defmodule RubberBand.Client.CodecErrorTest do
   use ExUnit.Case, async: true
 
-  alias RubberBand.Client.CodecError
+  alias RubberBand.CodecError
 
   @error %CodecError{operation: :decode}
 

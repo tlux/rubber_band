@@ -4,14 +4,14 @@ defmodule RubberBand.ClientTest do
   import Mox
 
   alias RubberBand.Client
-  alias RubberBand.Client.Codec
-  alias RubberBand.Client.CodecError
-  alias RubberBand.Client.Config
-  alias RubberBand.Client.URLBuilder
+  alias RubberBand.Codec
+  alias RubberBand.CodecError
+  alias RubberBand.Config
   alias RubberBand.Drivers.Mock, as: MockDriver
   alias RubberBand.RequestError
   alias RubberBand.Response
   alias RubberBand.ResponseError
+  alias RubberBand.URLBuilder
 
   setup :verify_on_exit!
 

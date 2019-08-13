@@ -1,8 +1,8 @@
 defmodule RubberBand.Client.URLBuilderTest do
   use ExUnit.Case, async: true
 
-  alias RubberBand.Client.Config
-  alias RubberBand.Client.URLBuilder
+  alias RubberBand.Config
+  alias RubberBand.URLBuilder
 
   describe "build_url/1" do
     test "get URL when path nil" do

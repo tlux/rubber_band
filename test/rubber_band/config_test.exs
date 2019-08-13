@@ -1,7 +1,7 @@
 defmodule RubberBand.Client.ConfigTest do
   use ExUnit.Case, async: true
 
-  alias RubberBand.Client.Config
+  alias RubberBand.Config
 
   describe "new/1" do
     test "build with config" do

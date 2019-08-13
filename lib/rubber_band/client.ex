@@ -4,15 +4,15 @@ defmodule RubberBand.Client do
   Elasticsearch.
   """
 
-  alias RubberBand.Client.CodecError
-  alias RubberBand.Client.Config
+  alias RubberBand.CodecError
+  alias RubberBand.Config
   alias RubberBand.Driver
   alias RubberBand.RequestError
   alias RubberBand.Response
   alias RubberBand.ResponseError
 
-  import RubberBand.Client.Codec
-  import RubberBand.Client.URLBuilder
+  import RubberBand.Codec
+  import RubberBand.URLBuilder
 
   @type req_data ::
           String.t() | Keyword.t() | %{optional(atom | String.t()) => any}

@@ -1,9 +1,8 @@
-defmodule RubberBand.Client.URLBuilder do
+defmodule RubberBand.URLBuilder do
+  @moduledoc false
+
   @separator "/"
 
-  @doc """
-  Builds a full URL using the configured endpoint.
-  """
   @spec build_url(Config.t(), nil | String.t() | [String.t()]) :: URI.t()
   def build_url(config, path_or_segments)
 
