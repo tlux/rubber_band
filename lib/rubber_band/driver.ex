@@ -1,4 +1,10 @@
 defmodule RubberBand.Driver do
+  @moduledoc """
+  A behavior that must be implemented by custom Elasticsearch drivers. A driver
+  sends a request to the Elasticsearch endpoint and retrieves the particular
+  response.
+  """
+
   @type verb :: :head | :get | :post | :put | :delete
 
   @type req_headers ::
@@ -9,7 +15,7 @@ defmodule RubberBand.Driver do
   @type resp_headers :: [{String.t(), binary}]
 
   @type resp :: %{
-          status_code: term,
+          status_code: integer,
           headers: resp_headers,
           body: binary
         }

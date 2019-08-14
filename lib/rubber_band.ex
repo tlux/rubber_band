@@ -1,2 +1,0 @@
-defmodule RubberBand do
-end

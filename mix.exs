@@ -13,10 +13,12 @@ defmodule RubberBand.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
       preferred_cli_env: [
+        ci: :test,
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.post": :test,
-        "coveralls.html": :test
+        "coveralls.html": :test,
+        dialyzer: :test
       ],
       test_coverage: [tool: ExCoveralls],
       dialyzer: [plt_add_apps: [:mix]],
@@ -62,7 +64,7 @@ defmodule RubberBand.MixProject do
       ci: [
         "format --check-formatted",
         "credo --strict",
-        "dialyzer --halt-exit-status",
+        "dialyzer",
         "test --cover"
       ]
     ]
