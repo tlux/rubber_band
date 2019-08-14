@@ -4,6 +4,7 @@ defmodule RubberBand.Client do
   Elasticsearch.
   """
 
+  alias __MODULE__
   alias RubberBand.CodecError
   alias RubberBand.Config
   alias RubberBand.Driver
@@ -72,77 +73,77 @@ defmodule RubberBand.Client do
 
   defmacro __using__(opts \\ []) do
     quote do
-      @behaviour unquote(__MODULE__)
+      @behaviour Client
 
       @doc false
       @spec __config__() :: Config.t()
       def __config__ do
         unquote(opts[:otp_app])
-        |> Application.get_env(unquote(__MODULE__), [])
+        |> Application.get_env(__MODULE__, [])
         |> Config.new()
       end
 
       @impl true
       def request(verb, path, req_path \\ %{}) do
-        unquote(__MODULE__).request(__config__(), verb, path, req_path)
+        Client.request(__config__(), verb, path, req_path)
       end
 
       @impl true
       def request!(verb, path, req_path \\ %{}) do
-        unquote(__MODULE__).request!(__config__(), verb, path, req_path)
+        Client.request!(__config__(), verb, path, req_path)
       end
 
       @impl true
       def head(path) do
-        unquote(__MODULE__).head(__config__(), path)
+        Client.head(__config__(), path)
       end
 
       @impl true
       def head!(path) do
-        unquote(__MODULE__).head!(__config__(), path)
+        Client.head!(__config__(), path)
       end
 
       @impl true
       def get(path) do
-        unquote(__MODULE__).get(__config__(), path)
+        Client.get(__config__(), path)
       end
 
       @impl true
       def get!(path) do
-        unquote(__MODULE__).get!(__config__(), path)
+        Client.get!(__config__(), path)
       end
 
       @impl true
       def post(path, req_path \\ %{}) do
-        unquote(__MODULE__).post(__config__(), path, req_path)
+        Client.post(__config__(), path, req_path)
       end
 
       @impl true
       def post!(path, req_path \\ %{}) do
-        unquote(__MODULE__).post!(__config__(), path, req_path)
+        Client.post!(__config__(), path, req_path)
       end
 
       @impl true
       def put(path, req_path \\ %{}) do
-        unquote(__MODULE__).put(__config__(), path, req_path)
+        Client.put(__config__(), path, req_path)
       end
 
       @impl true
       def put!(path, req_path \\ %{}) do
-        unquote(__MODULE__).put!(__config__(), path, req_path)
+        Client.put!(__config__(), path, req_path)
       end
 
       @impl true
       def delete(path) do
-        unquote(__MODULE__).delete(__config__(), path)
+        Client.delete(__config__(), path)
       end
 
       @impl true
       def delete!(path) do
-        unquote(__MODULE__).delete!(__config__(), path)
+        Client.delete!(__config__(), path)
       end
 
-      defoverridable unquote(__MODULE__)
+      defoverridable Client
     end
   end
 

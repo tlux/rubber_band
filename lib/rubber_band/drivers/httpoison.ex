@@ -1,6 +1,6 @@
 defmodule RubberBand.Drivers.HTTPoison do
   @moduledoc """
-  An adapter implementation that uses HTTPoison to do HTTP requests to
+  An adapter implementation that uses HTTPoison to dispatch requests to
   Elasticsearch.
   """
 
