@@ -26,8 +26,8 @@ defmodule RubberBand.MixProject do
       # Docs
       name: "App Monitoring",
       source_url:
-        "https://github.com/tlux/rubberband/blob/master/%{path}#L%{line}",
-      homepage_url: "https://github.com/tlux/rubberband",
+        "https://github.com/tlux/rubber_band/blob/master/%{path}#L%{line}",
+      homepage_url: "https://github.com/tlux/rubber_band",
       docs: [
         main: "readme",
         extras: ["README.md"],
