@@ -1,6 +1,8 @@
 defmodule RubberBand.URLBuilder do
   @moduledoc false
 
+  alias RubberBand.Config
+
   @separator "/"
 
   @spec build_url(Config.t(), nil | String.t() | [String.t()]) :: URI.t()

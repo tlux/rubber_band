@@ -3,9 +3,9 @@ defmodule RubberBand.RequestError do
   An error that is returned or raised when the search API returned an error.
   """
 
-  @type t :: %__MODULE__{id: nil | reference, reason: any}
+  @type t :: %__MODULE__{reason: any}
 
-  defexception [:id, :reason]
+  defexception [:reason]
 
   @impl true
   def message(%__MODULE__{} = error) do

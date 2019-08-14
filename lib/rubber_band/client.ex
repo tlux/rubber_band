@@ -158,8 +158,9 @@ defmodule RubberBand.Client do
   def request(%Config{} = config, verb, path, req_data \\ %{}) do
     with {:ok, req_data} <- encode(config, req_data),
          {:ok, resp} <- do_request(config, verb, path, req_data),
-         {:ok, resp_data} <- do_decode(config, resp) do
-      build_resp(resp_data, resp.status_code)
+         content_type = get_content_type(resp.headers),
+         {:ok, resp_data} <- decode(config, content_type, resp.body) do
+      build_resp(resp.status_code, content_type, resp_data)
     end
   end
 
@@ -188,14 +189,9 @@ defmodule RubberBand.Client do
       {:ok, resp} ->
         {:ok, resp}
 
-      {:error, %{id: id, reason: reason}} ->
-        {:error, %RequestError{id: id, reason: reason}}
+      {:error, %{reason: reason}} ->
+        {:error, %RequestError{reason: reason}}
     end
-  end
-
-  defp do_decode(config, resp) do
-    content_type = get_content_type(resp.headers)
-    decode(config, content_type, resp.body)
   end
 
   defp get_content_type(headers) do
@@ -291,7 +287,7 @@ defmodule RubberBand.Client do
           Response.t() | no_return
   def delete!(config, path), do: request!(config, :delete, path)
 
-  defp build_resp(%{error: error} = data, status_code) do
+  defp build_resp(status_code, _content_type, %{error: error} = data) do
     attrs =
       error
       |> Map.take([:col, :line, :reason, :type])
@@ -301,7 +297,8 @@ defmodule RubberBand.Client do
     {:error, struct(ResponseError, attrs)}
   end
 
-  defp build_resp(data, status_code) do
-    {:ok, %Response{data: data, status_code: status_code}}
+  defp build_resp(status_code, content_type, data) do
+    {:ok,
+     %Response{content_type: content_type, data: data, status_code: status_code}}
   end
 end

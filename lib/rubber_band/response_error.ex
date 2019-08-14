@@ -8,7 +8,7 @@ defmodule RubberBand.ResponseError do
           data: nil | %{optional(atom) => any},
           line: nil | non_neg_integer,
           reason: any,
-          status_code: term,
+          status_code: integer,
           type: nil | String.t()
         }
 
