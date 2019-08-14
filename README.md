@@ -13,7 +13,7 @@ by adding `rubberband` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:rubberband, "~> 0.1.0"}
+    {:rubber_band, "~> 0.1.0"}
   ]
 end
 ```
