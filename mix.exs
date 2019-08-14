@@ -24,7 +24,7 @@ defmodule RubberBand.MixProject do
       dialyzer: [plt_add_apps: [:mix]],
 
       # Docs
-      name: "App Monitoring",
+      name: "RubberBand",
       source_url:
         "https://github.com/tlux/rubber_band/blob/master/%{path}#L%{line}",
       homepage_url: "https://github.com/tlux/rubber_band",

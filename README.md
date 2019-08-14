@@ -1,4 +1,4 @@
-# Rubber Band
+# RubberBand
 
 [![Build Status](https://travis-ci.org/tlux/rubber_band.svg?branch=master)](https://travis-ci.org/tlux/rubber_band)
 [![Hex.pm](https://img.shields.io/hexpm/v/rubber_band.svg)](https://hex.pm/packages/rubber_band)
