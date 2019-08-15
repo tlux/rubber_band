@@ -14,134 +14,87 @@ defmodule RubberBand.Client do
 
   import RubberBand.Codec
   import RubberBand.URLBuilder
+  
+  @type path :: String.t() | [String.t()]
 
   @type req_data ::
           String.t() | Keyword.t() | %{optional(atom | String.t()) => any}
 
   @type error :: CodecError.t() | RequestError.t() | ResponseError.t()
 
-  @callback request(verb :: Driver.verb(), path :: String.t()) ::
-              {:ok, Response.t()} | {:error, error}
+  @callback request(verb :: Driver.verb(), path) :: {:ok, Response.t()} | {:error, error}
 
-  @callback request(
-              verb :: Driver.verb(),
-              path :: String.t(),
-              req_data
-            ) :: {:ok, Response.t()} | {:error, error}
+  @callback request(verb :: Driver.verb(), path, req_data) :: {:ok, Response.t()} | {:error, error}
 
-  @callback request!(verb :: Driver.verb(), path :: String.t()) ::
-              Response.t() | no_return
+  @callback request!(verb :: Driver.verb(), path) :: Response.t() | no_return
 
-  @callback request!(
-              verb :: Driver.verb(),
-              path :: String.t(),
-              req_data
-            ) :: Response.t() | no_return
+  @callback request!(verb :: Driver.verb(), path, req_data) :: Response.t() | no_return
 
-  @callback head(path :: String.t()) ::
-              {:ok, Response.t()} | {:error, error}
+  @callback head(path) :: {:ok, Response.t()} | {:error, error}
 
-  @callback head!(path :: String.t()) :: Response.t() | no_return
+  @callback head!(path) :: Response.t() | no_return
 
-  @callback get(path :: String.t()) :: {:ok, Response.t()} | {:error, error}
+  @callback get(path) :: {:ok, Response.t()} | {:error, error}
 
-  @callback get!(path :: String.t()) :: Response.t() | no_return
+  @callback get!(path) :: Response.t() | no_return
 
-  @callback post(path :: String.t()) ::
-              {:ok, Response.t()} | {:error, error}
+  @callback post(path) :: {:ok, Response.t()} | {:error, error}
 
-  @callback post(path :: String.t(), req_data) ::
-              {:ok, Response.t()} | {:error, error}
+  @callback post(path, req_data) :: {:ok, Response.t()} | {:error, error}
 
-  @callback post!(path :: String.t()) :: Response.t() | no_return
+  @callback post!(path) :: Response.t() | no_return
 
-  @callback post!(path :: String.t(), req_data) :: Response.t() | no_return
+  @callback post!(path, req_data) :: Response.t() | no_return
 
-  @callback put(path :: String.t()) :: {:ok, Response.t()} | {:error, error}
+  @callback put(path) :: {:ok, Response.t()} | {:error, error}
 
-  @callback put(path :: String.t(), req_data) ::
-              {:ok, Response.t()} | {:error, error}
+  @callback put(path, req_data) :: {:ok, Response.t()} | {:error, error}
 
-  @callback put!(path :: String.t()) :: Response.t() | no_return
+  @callback put!(path) :: Response.t() | no_return
 
-  @callback put!(path :: String.t(), req_data) :: Response.t() | no_return
+  @callback put!(path, req_data) :: Response.t() | no_return
 
-  @callback delete(path :: String.t()) ::
-              {:ok, Response.t()} | {:error, error}
+  @callback delete(path) :: {:ok, Response.t()} | {:error, error}
 
-  @callback delete!(path :: String.t()) :: Response.t() | no_return
+  @callback delete!(path) :: Response.t() | no_return
 
-  defmacro __using__(opts \\ []) do
+  defmacro __using__(opts) do
+    otp_app = Keyword.fetch!(opts, :otp_app)
+
     quote do
       @behaviour Client
 
       @doc false
       @spec __config__() :: Config.t()
       def __config__ do
-        unquote(opts[:otp_app])
+        unquote(otp_app)
         |> Application.get_env(__MODULE__, [])
         |> Config.new()
       end
 
       @impl true
-      def request(verb, path, req_path \\ %{}) do
+      def request(verb, path, req_data \\ %{}) do
         Client.request(__config__(), verb, path, req_path)
       end
 
       @impl true
-      def request!(verb, path, req_path \\ %{}) do
+      def request!(verb, path, req_data \\ %{}) do
         Client.request!(__config__(), verb, path, req_path)
       end
-
-      @impl true
-      def head(path) do
-        Client.head(__config__(), path)
-      end
-
-      @impl true
-      def head!(path) do
-        Client.head!(__config__(), path)
-      end
-
-      @impl true
-      def get(path) do
-        Client.get(__config__(), path)
-      end
-
-      @impl true
-      def get!(path) do
-        Client.get!(__config__(), path)
-      end
-
-      @impl true
-      def post(path, req_path \\ %{}) do
-        Client.post(__config__(), path, req_path)
-      end
-
-      @impl true
-      def post!(path, req_path \\ %{}) do
-        Client.post!(__config__(), path, req_path)
-      end
-
-      @impl true
-      def put(path, req_path \\ %{}) do
-        Client.put(__config__(), path, req_path)
-      end
-
-      @impl true
-      def put!(path, req_path \\ %{}) do
-        Client.put!(__config__(), path, req_path)
-      end
-
-      @impl true
-      def delete(path) do
-        Client.delete(__config__(), path)
-      end
-
-      @impl true
-      def delete!(path) do
-        Client.delete!(__config__(), path)
-      end
+      
+      Enum.each([:head, :head!, :get, :get!, :delete, :delete!], fn fun ->
+        @impl true
+        def unquote(fun)(path) do
+          Client.unquote(fun)(__config__(), path)
+        end
+      end)
+      
+      Enum.each([:post, :post!, :put, :put!], fn fun ->
+        @impl true
+        def unquote(fun)(path, req_data \\ %{}) do
+          Client.unquote(fun)(__config__(), path, req_data)
+        end
+      end)
 
       defoverridable Client
     end
