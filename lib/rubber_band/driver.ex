@@ -5,7 +5,7 @@ defmodule RubberBand.Driver do
   response.
   """
 
-  @type verb :: :head | :get | :post | :put | :delete
+  alias RubberBand.Client
 
   @type req_headers ::
           Keyword.t(binary)
@@ -27,7 +27,7 @@ defmodule RubberBand.Driver do
   endpoint.
   """
   @callback request(
-              verb,
+              verb :: Client.verb(),
               url :: URI.t(),
               body :: binary,
               headers :: req_headers,
