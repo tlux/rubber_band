@@ -163,38 +163,33 @@ defmodule RubberBand.Client do
   @doc """
   Sends a `HEAD` request to the configured endpoint.
   """
-  @spec head(config :: Config.t(), path :: String.t()) ::
-          {:ok, Response.t()} | {:error, error}
-  def head(config, path), do: request(config, :head, path)
+  @spec head(config :: Config.t(), path) :: {:ok, Response.t()} | {:error, error}
+  def head(%Config{} = config, path), do: request(config, :head, path)
 
   @doc """
   Sends a `HEAD` request to the configured endpoint. Raises when an error
   occurs.
   """
-  @spec head!(config :: Config.t(), path :: String.t()) ::
-          Response.t() | no_return
-  def head!(config, path), do: request!(config, :head, path)
+  @spec head!(config :: Config.t(), path) :: Response.t() | no_return
+  def head!(%Config{} = config, path), do: request!(config, :head, path)
 
   @doc """
   Sends a `GET` request to the configured endpoint.
   """
-  @spec get(config :: Config.t(), path :: String.t()) ::
-          {:ok, Response.t()} | {:error, error}
-  def get(config, path), do: request(config, :get, path)
+  @spec get(config :: Config.t(), path) :: {:ok, Response.t()} | {:error, error}
+  def get(%Config{} = config, path), do: request(config, :get, path)
 
   @doc """
   Sends a `GET` request to the configured endpoint. Raises when an error occurs.
   """
-  @spec get!(config :: Config.t(), path :: String.t()) ::
-          Response.t() | no_return
-  def get!(config, path), do: request!(config, :get, path)
+  @spec get!(config :: Config.t(), path) :: Response.t() | no_return
+  def get!(%Config{} = config, path), do: request!(config, :get, path)
 
   @doc """
   Sends a `POST` request to the configured endpoint.
   """
-  @spec post(config :: Config.t(), path :: String.t(), req_data) ::
-          {:ok, Response.t()} | {:error, error}
-  def post(config, path, req_data \\ %{}) do
+  @spec post(config :: Config.t(), path, req_data) :: {:ok, Response.t()} | {:error, error}
+  def post(%Config{} = config, path, req_data \\ %{}) do
     request(config, :post, path, req_data)
   end
 
@@ -202,44 +197,39 @@ defmodule RubberBand.Client do
   Sends a `POST` request to the configured endpoint. Raises when an error
   occurs.
   """
-  @spec post!(config :: Config.t(), path :: String.t(), req_data) ::
-          Response.t() | no_return
-  def post!(config, path, req_data \\ %{}) do
+  @spec post!(config :: Config.t(), path, req_data) :: Response.t() | no_return
+  def post!(%Config{} = config, path, req_data \\ %{}) do
     request!(config, :post, path, req_data)
   end
 
   @doc """
   Sends a `PUT` request to the configured endpoint.
   """
-  @spec put(config :: Config.t(), path :: String.t(), req_data) ::
-          {:ok, Response.t()} | {:error, error}
-  def put(config, path, req_data \\ %{}) do
+  @spec put(config :: Config.t(), path, req_data) :: {:ok, Response.t()} | {:error, error}
+  def put(%Config{} = config, path, req_data \\ %{}) do
     request(config, :put, path, req_data)
   end
 
   @doc """
   Sends a `PUT` request to the configured endpoint. Raises when an error occurs.
   """
-  @spec put!(config :: Config.t(), path :: String.t(), req_data) ::
-          Response.t() | no_return
-  def put!(config, path, req_data \\ %{}) do
+  @spec put!(config :: Config.t(), path, req_data) :: Response.t() | no_return
+  def put!(%Config{} = config, path, req_data \\ %{}) do
     request!(config, :put, path, req_data)
   end
 
   @doc """
   Sends a `DELETE` request to the configured endpoint.
   """
-  @spec delete(config :: Config.t(), path :: String.t()) ::
-          {:ok, Response.t()} | {:error, error}
-  def delete(config, path), do: request(config, :delete, path)
+  @spec delete(config :: Config.t(), path) :: {:ok, Response.t()} | {:error, error}
+  def delete(%Config{} = config, path), do: request(config, :delete, path)
 
   @doc """
   Sends a `DELETE` request to the configured endpoint. Raises when an error
   occurs.
   """
-  @spec delete!(config :: Config.t(), path :: String.t()) ::
-          Response.t() | no_return
-  def delete!(config, path), do: request!(config, :delete, path)
+  @spec delete!(config :: Config.t(), path) :: Response.t() | no_return
+  def delete!(%Config{} = config, path), do: request!(config, :delete, path)
 
   defp build_resp(status_code, _content_type, %{error: error} = data) do
     attrs =
