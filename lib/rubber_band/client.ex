@@ -14,9 +14,9 @@ defmodule RubberBand.Client do
 
   import RubberBand.Codec
   import RubberBand.URLBuilder
-  
+
   @type verb :: :head | :get | :post | :put | :delete
- 
+
   @type path :: String.t() | [String.t()]
 
   @type req_data ::
@@ -26,7 +26,8 @@ defmodule RubberBand.Client do
 
   @callback request(verb, path) :: {:ok, Response.t()} | {:error, error}
 
-  @callback request(verb, path, req_data) :: {:ok, Response.t()} | {:error, error}
+  @callback request(verb, path, req_data) ::
+              {:ok, Response.t()} | {:error, error}
 
   @callback request!(verb, path) :: Response.t() | no_return
 
@@ -83,14 +84,14 @@ defmodule RubberBand.Client do
       def request!(verb, path, req_data \\ %{}) do
         Client.request!(__config__(), verb, path, req_path)
       end
-      
+
       Enum.each([:head, :head!, :get, :get!, :delete, :delete!], fn fun ->
         @impl true
         def unquote(fun)(path) do
           Client.unquote(fun)(__config__(), path)
         end
       end)
-      
+
       Enum.each([:post, :post!, :put, :put!], fn fun ->
         @impl true
         def unquote(fun)(path, req_data \\ %{}) do
@@ -105,7 +106,8 @@ defmodule RubberBand.Client do
   @doc """
   Sends a request with the given verb to the configured endpoint.
   """
-  @spec request(config :: Config.t(), verb, path, req_data) :: {:ok, Response.t()} | {:error, error}
+  @spec request(config :: Config.t(), verb, path, req_data) ::
+          {:ok, Response.t()} | {:error, error}
   def request(%Config{} = config, verb, path, req_data \\ %{}) do
     with {:ok, req_data} <- encode(config, req_data),
          {:ok, resp} <- do_request(config, verb, path, req_data),
@@ -119,7 +121,8 @@ defmodule RubberBand.Client do
   Sends a request with the given verb to the configured endpoint. Raises when an
   error occurs.
   """
-  @spec request!(config :: Config.t(), verb, path, req_data) :: Response.t() | no_return
+  @spec request!(config :: Config.t(), verb, path, req_data) ::
+          Response.t() | no_return
   def request!(%Config{} = config, verb, path, req_data \\ %{}) do
     case request(config, verb, path, req_data) do
       {:ok, resp} -> resp
@@ -155,7 +158,8 @@ defmodule RubberBand.Client do
   @doc """
   Sends a `HEAD` request to the configured endpoint.
   """
-  @spec head(config :: Config.t(), path) :: {:ok, Response.t()} | {:error, error}
+  @spec head(config :: Config.t(), path) ::
+          {:ok, Response.t()} | {:error, error}
   def head(%Config{} = config, path), do: request(config, :head, path)
 
   @doc """
@@ -180,7 +184,8 @@ defmodule RubberBand.Client do
   @doc """
   Sends a `POST` request to the configured endpoint.
   """
-  @spec post(config :: Config.t(), path, req_data) :: {:ok, Response.t()} | {:error, error}
+  @spec post(config :: Config.t(), path, req_data) ::
+          {:ok, Response.t()} | {:error, error}
   def post(%Config{} = config, path, req_data \\ %{}) do
     request(config, :post, path, req_data)
   end
@@ -197,7 +202,8 @@ defmodule RubberBand.Client do
   @doc """
   Sends a `PUT` request to the configured endpoint.
   """
-  @spec put(config :: Config.t(), path, req_data) :: {:ok, Response.t()} | {:error, error}
+  @spec put(config :: Config.t(), path, req_data) ::
+          {:ok, Response.t()} | {:error, error}
   def put(%Config{} = config, path, req_data \\ %{}) do
     request(config, :put, path, req_data)
   end
@@ -213,7 +219,8 @@ defmodule RubberBand.Client do
   @doc """
   Sends a `DELETE` request to the configured endpoint.
   """
-  @spec delete(config :: Config.t(), path) :: {:ok, Response.t()} | {:error, error}
+  @spec delete(config :: Config.t(), path) ::
+          {:ok, Response.t()} | {:error, error}
   def delete(%Config{} = config, path), do: request(config, :delete, path)
 
   @doc """
