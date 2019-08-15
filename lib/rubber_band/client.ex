@@ -15,6 +15,8 @@ defmodule RubberBand.Client do
   import RubberBand.Codec
   import RubberBand.URLBuilder
   
+  @type verb :: :head | :get | :post | :put | :delete
+ 
   @type path :: String.t() | [String.t()]
 
   @type req_data ::
@@ -22,13 +24,13 @@ defmodule RubberBand.Client do
 
   @type error :: CodecError.t() | RequestError.t() | ResponseError.t()
 
-  @callback request(verb :: Driver.verb(), path) :: {:ok, Response.t()} | {:error, error}
+  @callback request(verb, path) :: {:ok, Response.t()} | {:error, error}
 
-  @callback request(verb :: Driver.verb(), path, req_data) :: {:ok, Response.t()} | {:error, error}
+  @callback request(verb, path, req_data) :: {:ok, Response.t()} | {:error, error}
 
-  @callback request!(verb :: Driver.verb(), path) :: Response.t() | no_return
+  @callback request!(verb, path) :: Response.t() | no_return
 
-  @callback request!(verb :: Driver.verb(), path, req_data) :: Response.t() | no_return
+  @callback request!(verb, path, req_data) :: Response.t() | no_return
 
   @callback head(path) :: {:ok, Response.t()} | {:error, error}
 
@@ -103,12 +105,7 @@ defmodule RubberBand.Client do
   @doc """
   Sends a request with the given verb to the configured endpoint.
   """
-  @spec request(
-          config :: Config.t(),
-          verb :: Driver.verb(),
-          path :: String.t(),
-          req_data
-        ) :: {:ok, Response.t()} | {:error, error}
+  @spec request(config :: Config.t(), verb, path, req_data) :: {:ok, Response.t()} | {:error, error}
   def request(%Config{} = config, verb, path, req_data \\ %{}) do
     with {:ok, req_data} <- encode(config, req_data),
          {:ok, resp} <- do_request(config, verb, path, req_data),
@@ -122,12 +119,7 @@ defmodule RubberBand.Client do
   Sends a request with the given verb to the configured endpoint. Raises when an
   error occurs.
   """
-  @spec request!(
-          config :: Config.t(),
-          verb :: Driver.verb(),
-          path :: String.t(),
-          req_data
-        ) :: Response.t() | no_return
+  @spec request!(config :: Config.t(), verb, path, req_data) :: Response.t() | no_return
   def request!(%Config{} = config, verb, path, req_data \\ %{}) do
     case request(config, verb, path, req_data) do
       {:ok, resp} -> resp
