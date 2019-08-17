@@ -11,7 +11,7 @@ defmodule RubberBand.ClientTest do
   alias RubberBand.RequestError
   alias RubberBand.Response
   alias RubberBand.ResponseError
-  alias RubberBand.URLBuilder
+  alias RubberBand.Utils
 
   setup :verify_on_exit!
 
@@ -21,11 +21,11 @@ defmodule RubberBand.ClientTest do
     test "call driver" do
       verb = :get
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn ^verb, ^url, "{}", [], ^opts ->
+      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
         {:ok,
          %{
            status_code: 200,
@@ -46,11 +46,11 @@ defmodule RubberBand.ClientTest do
     test "decode error" do
       verb = :put
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn ^verb, ^url, "{}", [], ^opts ->
+      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
         {:ok,
          %{
            status_code: 200,
@@ -66,11 +66,11 @@ defmodule RubberBand.ClientTest do
     test "request error" do
       verb = :post
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn ^verb, ^url, "{}", [], ^opts ->
+      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -81,7 +81,7 @@ defmodule RubberBand.ClientTest do
     test "response error" do
       verb = :delete
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
 
       resp_data = %{
@@ -93,7 +93,7 @@ defmodule RubberBand.ClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn ^verb, ^url, "{}", [], ^opts ->
+      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
         {:ok,
          %{
            status_code: 200,
@@ -119,11 +119,11 @@ defmodule RubberBand.ClientTest do
     test "call driver" do
       verb = :get
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn ^verb, ^url, "{}", [], ^opts ->
+      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
         {:ok,
          %{
            status_code: 200,
@@ -143,11 +143,11 @@ defmodule RubberBand.ClientTest do
     test "decode error" do
       verb = :put
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn ^verb, ^url, "{}", [], ^opts ->
+      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
         {:ok,
          %{
            status_code: 200,
@@ -164,12 +164,12 @@ defmodule RubberBand.ClientTest do
     test "request error" do
       verb = :post
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
 
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn ^verb, ^url, "{}", [], ^opts ->
+      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -181,7 +181,7 @@ defmodule RubberBand.ClientTest do
     test "response error" do
       verb = :delete
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
 
       resp_data = %{
@@ -193,7 +193,7 @@ defmodule RubberBand.ClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn ^verb, ^url, "{}", [], ^opts ->
+      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
         {:ok,
          %{
            status_code: 200,
@@ -214,7 +214,7 @@ defmodule RubberBand.ClientTest do
     test "call driver" do
       verb = :get
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
@@ -250,7 +250,7 @@ defmodule RubberBand.ClientTest do
     test "decode error" do
       verb = :put
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
@@ -272,7 +272,7 @@ defmodule RubberBand.ClientTest do
     test "request error" do
       verb = :post
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
@@ -289,7 +289,7 @@ defmodule RubberBand.ClientTest do
     test "response error" do
       verb = :delete
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
@@ -329,7 +329,7 @@ defmodule RubberBand.ClientTest do
     test "call driver" do
       verb = :get
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
@@ -365,7 +365,7 @@ defmodule RubberBand.ClientTest do
     test "decode error" do
       verb = :put
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
@@ -388,7 +388,7 @@ defmodule RubberBand.ClientTest do
     test "request error" do
       verb = :post
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
@@ -406,7 +406,7 @@ defmodule RubberBand.ClientTest do
     test "response error" do
       verb = :delete
       path = "my-index/_search"
-      url = URLBuilder.build_url(@config, path)
+      url = Utils.build_url(@config, path)
       opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)

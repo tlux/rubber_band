@@ -15,12 +15,13 @@ defmodule RubberBand.Driver do
   @type resp_headers :: [{String.t(), binary}]
 
   @type resp :: %{
-          status_code: integer,
-          headers: resp_headers,
-          body: binary
+          required(:status_code) => non_neg_integer,
+          required(:headers) => resp_headers,
+          required(:body) => binary,
+          optional(atom) => any
         }
 
-  @type error :: %{reason: any}
+  @type error :: %{:reason => any, optional(atom) => any}
 
   @doc """
   A callback for implementing an own function to send a request to a HTTP
