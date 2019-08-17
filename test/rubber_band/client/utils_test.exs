@@ -4,82 +4,6 @@ defmodule RubberBand.Client.UtilsTest do
   alias RubberBand.Client.Config
   alias RubberBand.Client.Utils
 
-  describe "split_path/1" do
-    test "get empty list when arg nil" do
-      assert Utils.split_path(nil) == []
-    end
-
-    test "get list of segments" do
-      assert Utils.split_path("this/is/my/path") == ["this", "is", "my", "path"]
-    end
-
-    test "get flat list of sements" do
-      assert Utils.split_path([["this/is"], "my", ["path"]]) == [
-               "this",
-               "is",
-               "my",
-               "path"
-             ]
-    end
-
-    test "strip empty segments" do
-      assert Utils.split_path("this///is/my/path") == [
-               "this",
-               "is",
-               "my",
-               "path"
-             ]
-
-      assert Utils.split_path("//this///is/my/path/") == [
-               "this",
-               "is",
-               "my",
-               "path"
-             ]
-    end
-  end
-
-  describe "join_path/1" do
-    test "get empty string when arg empty list" do
-      assert Utils.join_path([]) == ""
-    end
-
-    test "get path string" do
-      assert Utils.join_path(["this", "is", "my", "path"]) == "this/is/my/path"
-    end
-
-    test "get path string from nested segments" do
-      assert Utils.join_path(["this", "is", ["my", "path"]]) ==
-               "this/is/my/path"
-    end
-
-    test "ignore empty segments" do
-      assert Utils.join_path(["this", nil, "", "is", "my", "path"]) ==
-               "this/is/my/path"
-    end
-  end
-
-  describe "absolute_join_path/1" do
-    test "get empty string when arg empty list" do
-      assert Utils.absolute_join_path([]) == "/"
-    end
-
-    test "get path string" do
-      assert Utils.absolute_join_path(["this", "is", "my", "path"]) ==
-               "/this/is/my/path"
-    end
-
-    test "get path string from nested segments" do
-      assert Utils.absolute_join_path(["this", "is", ["my", "path"]]) ==
-               "/this/is/my/path"
-    end
-
-    test "ignore empty segments" do
-      assert Utils.absolute_join_path(["this", nil, "", "is", "my", "path"]) ==
-               "/this/is/my/path"
-    end
-  end
-
   describe "build_url/1" do
     test "get URL when path nil" do
       base_url = "http://localhost:9200/root"
@@ -135,6 +59,48 @@ defmodule RubberBand.Client.UtilsTest do
 
       assert Utils.build_url(config, ["my-path", "my-nested-path"]) ==
                URI.parse("http://localhost:9200/root/my-path/my-nested-path")
+    end
+
+    test "get URL with path and query" do
+      config = %Config{base_url: "http://localhost:9200/root"}
+
+      assert Utils.build_url(
+               config,
+               {"my-path/my-nested-path",
+                query1: "query content", query2: "value"}
+             ) ==
+               URI.parse(
+                 "http://localhost:9200/root/my-path/my-nested-path" <>
+                   "?query1=query+content&query2=value"
+               )
+    end
+
+    test "get URL with path segments and keyword query" do
+      config = %Config{base_url: "http://localhost:9200/root"}
+
+      assert Utils.build_url(
+               config,
+               {["my-path", "my-nested-path"],
+                query1: "query content", query2: "value"}
+             ) ==
+               URI.parse(
+                 "http://localhost:9200/root/my-path/my-nested-path" <>
+                   "?query1=query+content&query2=value"
+               )
+    end
+
+    test "get URL with path segments and map query" do
+      config = %Config{base_url: "http://localhost:9200/root"}
+
+      assert Utils.build_url(
+               config,
+               {["my-path", "my-nested-path"],
+                %{query1: "query content", query2: "value"}}
+             ) ==
+               URI.parse(
+                 "http://localhost:9200/root/my-path/my-nested-path" <>
+                   "?query1=query+content&query2=value"
+               )
     end
 
     test "get URL when base URL has no path segments" do

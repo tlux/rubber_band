@@ -6,44 +6,49 @@ defmodule RubberBand.Client.Utils do
 
   @separator "/"
 
-  @spec split_path(nil | Client.path()) :: Client.path_segments()
-  def split_path(path)
+  @spec build_url(
+          config :: Config.t(),
+          location :: nil | Client.location()
+        ) :: URI.t()
+  def build_url(config, location)
 
-  def split_path(nil), do: []
-
-  def split_path(path) when is_binary(path) do
-    String.split(path, @separator, trim: true)
-  end
-
-  def split_path(segments) when is_list(segments) do
-    Enum.flat_map(segments, &split_path/1)
-  end
-
-  @spec join_path(nil | Client.path_segments()) :: Client.path_str()
-  def join_path(segments)
-
-  def join_path([]), do: ""
-
-  def join_path(segments) when is_list(segments) do
-    segments
-    |> Enum.flat_map(&split_path/1)
-    |> Enum.join(@separator)
-  end
-
-  @spec absolute_join_path(nil | Client.path_segments()) :: Client.path_str()
-  def absolute_join_path(segments) do
-    @separator <> join_path(segments)
-  end
-
-  @spec build_url(Config.t(), nil | Client.path()) :: URI.t()
-  def build_url(config, path)
-
-  def build_url(%{base_url: nil}, _path_or_segments) do
+  def build_url(%{base_url: nil}, _location) do
     raise ArgumentError, "Missing base URL"
   end
 
-  def build_url(config, path) do
+  def build_url(config, {path, query}) do
     base_url = URI.parse(config.base_url)
-    %{base_url | path: absolute_join_path([base_url.path, path])}
+
+    %{
+      base_url
+      | path: build_path(base_url.path, path),
+        query: build_query(query)
+    }
+  end
+
+  def build_url(config, path) do
+    build_url(config, {path, nil})
+  end
+
+  defp build_query(nil), do: nil
+
+  defp build_query(query) do
+    case URI.encode_query(query) do
+      "" -> nil
+      query -> query
+    end
+  end
+
+  defp build_path(base_path, path) do
+    segments = normalize_path(base_path) ++ normalize_path(path)
+    @separator <> Enum.join(segments, @separator)
+  end
+
+  defp normalize_path(nil), do: []
+
+  defp normalize_path(segments) when is_list(segments), do: segments
+
+  defp normalize_path(path) do
+    String.split(path, @separator, trim: true)
   end
 end

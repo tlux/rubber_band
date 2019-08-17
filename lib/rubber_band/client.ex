@@ -61,6 +61,12 @@ defmodule RubberBand.Client do
   @type path :: path_str | path_segments
 
   @typedoc """
+  A type that defines a location on the remote server, allowing optional query
+  parameters.
+  """
+  @type location :: path | {path, query :: Enum.t()}
+
+  @typedoc """
   A type that defines request data.
   """
   @type req_data ::
@@ -89,92 +95,92 @@ defmodule RubberBand.Client do
   Dispatch a request to the path at the configured endpoint using the specified
   request method. Raises when the request fails.
   """
-  @callback request!(verb, path) :: Response.t() | no_return
+  @callback request!(verb, location) :: Response.t() | no_return
 
   @doc """
   Dispatch a request to the path at the configured endpoint using the specified
   request method and data. Raises when the request fails.
   """
-  @callback request!(verb, path, req_data) :: Response.t() | no_return
+  @callback request!(verb, location, req_data) :: Response.t() | no_return
 
   @doc """
   Dispatch a HEAD request to the path at the configured endpoint.
   """
-  @callback head(path) :: {:ok, Response.t()} | {:error, error}
+  @callback head(location) :: {:ok, Response.t()} | {:error, error}
 
   @doc """
   Dispatch a HEAD request to the path at the configured endpoint. Raises when
   the request fails.
   """
-  @callback head!(path) :: Response.t() | no_return
+  @callback head!(location) :: Response.t() | no_return
 
   @doc """
   Dispatch a GET request to the path at the configured endpoint.
   """
-  @callback get(path) :: {:ok, Response.t()} | {:error, error}
+  @callback get(location) :: {:ok, Response.t()} | {:error, error}
 
   @doc """
   Dispatch a GET request to the path at the configured endpoint. Raises when
   the request fails.
   """
-  @callback get!(path) :: Response.t() | no_return
+  @callback get!(location) :: Response.t() | no_return
 
   @doc """
   Dispatch a POST request to the path at the configured endpoint.
   """
-  @callback post(path) :: {:ok, Response.t()} | {:error, error}
+  @callback post(location) :: {:ok, Response.t()} | {:error, error}
 
   @doc """
   Dispatch a POST request to the path at the configured endpoint using the
   specified request data.
   """
-  @callback post(path, req_data) :: {:ok, Response.t()} | {:error, error}
+  @callback post(location, req_data) :: {:ok, Response.t()} | {:error, error}
 
   @doc """
   Dispatch a POST request to the path at the configured endpoint. Raises when
   the request fails.
   """
-  @callback post!(path) :: Response.t() | no_return
+  @callback post!(location) :: Response.t() | no_return
 
   @doc """
   Dispatch a POST request to the path at the configured endpoint using the
   specified request data. Raises when the request fails.
   """
-  @callback post!(path, req_data) :: Response.t() | no_return
+  @callback post!(location, req_data) :: Response.t() | no_return
 
   @doc """
   Dispatch a PUT request to the path at the configured endpoint.
   """
-  @callback put(path) :: {:ok, Response.t()} | {:error, error}
+  @callback put(location) :: {:ok, Response.t()} | {:error, error}
 
   @doc """
   Dispatch a PUT request to the path at the configured endpoint using the
   specified request data.
   """
-  @callback put(path, req_data) :: {:ok, Response.t()} | {:error, error}
+  @callback put(location, req_data) :: {:ok, Response.t()} | {:error, error}
 
   @doc """
   Dispatch a PUT request to the path at the configured endpoint. Raises when
   the request fails.
   """
-  @callback put!(path) :: Response.t() | no_return
+  @callback put!(location) :: Response.t() | no_return
 
   @doc """
   Dispatch a PUT request to the path at the configured endpoint using the
   specified request data. Raises when the request fails.
   """
-  @callback put!(path, req_data) :: Response.t() | no_return
+  @callback put!(location, req_data) :: Response.t() | no_return
 
   @doc """
   Dispatch a DELETE request to the path at the configured endpoint.
   """
-  @callback delete(path) :: {:ok, Response.t()} | {:error, error}
+  @callback delete(location) :: {:ok, Response.t()} | {:error, error}
 
   @doc """
   Dispatch a DELETE request to the path at the configured endpoint. Raises when
   the request fails.
   """
-  @callback delete!(path) :: Response.t() | no_return
+  @callback delete!(location) :: Response.t() | no_return
 
   defmacro __using__(opts) do
     otp_app = Keyword.fetch!(opts, :otp_app)
@@ -257,19 +263,19 @@ defmodule RubberBand.Client do
   @doc """
   Sends a request with the given verb to the configured endpoint.
   """
-  @spec request(config :: Config.t(), verb, path, nil | req_data) ::
+  @spec request(config :: Config.t(), verb, location, nil | req_data) ::
           {:ok, Response.t()} | {:error, error}
-  def request(%Config{} = config, verb, path, req_data \\ nil) do
+  def request(%Config{} = config, verb, location, req_data \\ nil) do
     with {:ok, req_data} <- Codec.encode(config, req_data),
-         {:ok, resp} <- do_request(config, verb, path, req_data),
+         {:ok, resp} <- do_request(config, verb, location, req_data),
          content_type = get_content_type(resp.headers),
          {:ok, resp_data} <- Codec.decode(config, content_type, resp.body) do
       build_resp(resp.status_code, content_type, resp_data)
     end
   end
 
-  defp do_request(config, verb, path, req_data) do
-    url = Utils.build_url(config, path)
+  defp do_request(config, verb, location, req_data) do
+    url = Utils.build_url(config, location)
     opts = [recv_timeout: config.timeout]
 
     case config.driver.request(verb, url, req_data, [], opts) do
@@ -312,10 +318,10 @@ defmodule RubberBand.Client do
   Dispatch a request to the path at the configured endpoint using the specified
   request method and data. Raises when the request fails.
   """
-  @spec request!(Config.t(), verb, path, nil | req_data) ::
+  @spec request!(Config.t(), verb, location, nil | req_data) ::
           Response.t() | no_return
-  def request!(%Config{} = config, verb, path, req_data \\ nil) do
-    case request(config, verb, path, req_data) do
+  def request!(%Config{} = config, verb, location, req_data \\ nil) do
+    case request(config, verb, location, req_data) do
       {:ok, resp} -> resp
       {:error, error} -> raise error
     end
@@ -324,85 +330,89 @@ defmodule RubberBand.Client do
   @doc """
   Dispatch a HEAD request to the path at the configured endpoint.
   """
-  @spec head(Config.t(), path) :: {:ok, Response.t()} | {:error, error}
-  def head(%Config{} = config, path), do: request(config, :head, path)
+  @spec head(Config.t(), location) :: {:ok, Response.t()} | {:error, error}
+  def head(%Config{} = config, location), do: request(config, :head, location)
 
   @doc """
   Dispatch a HEAD request to the path at the configured endpoint. Raises when
   the request fails.
   """
-  @spec head!(Config.t(), path) :: Response.t() | no_return
-  def head!(%Config{} = config, path), do: request!(config, :head, path)
+  @spec head!(Config.t(), location) :: Response.t() | no_return
+  def head!(%Config{} = config, location), do: request!(config, :head, location)
 
   @doc """
   Dispatch a GET request to the path at the configured endpoint.
   """
-  @spec get(Config.t(), path) ::
+  @spec get(Config.t(), location) ::
           {:ok, Response.t()} | {:error, error}
-  def get(%Config{} = config, path), do: request(config, :get, path)
-
-  @doc """
-  Dispatch a GET request to the path at the configured endpoint. Raises when
-  the request fails.
-  """
-  @spec get!(Config.t(), path) :: Response.t() | no_return
-  def get!(%Config{} = config, path), do: request!(config, :get, path)
-
-  @doc """
-  Dispatch a POST request to the path at the configured endpoint using the
-  specified request data.
-  """
-  @spec post(Config.t(), path, nil | req_data) ::
-          {:ok, Response.t()} | {:error, error}
-  def post(%Config{} = config, path, req_data \\ nil) do
-    request(config, :post, path, req_data)
-  end
-
-  @doc """
-  Dispatch a POST request to the path at the configured endpoint using the
-  specified request data. Raises when the request fails.
-  """
-  @spec post!(Config.t(), path, nil | req_data) ::
-          Response.t() | no_return
-  def post!(%Config{} = config, path, req_data \\ nil) do
-    request!(config, :post, path, req_data)
-  end
-
-  @doc """
-  Dispatch a PUT request to the path at the configured endpoint using the
-  specified request data.
-  """
-  @spec put(Config.t(), path, nil | req_data) ::
-          {:ok, Response.t()} | {:error, error}
-  def put(%Config{} = config, path, req_data \\ nil) do
-    request(config, :put, path, req_data)
-  end
-
-  @doc """
-  Dispatch a PUT request to the path at the configured endpoint using the
-  specified request data. Raises when the request fails.
-  """
-  @spec put!(Config.t(), path, nil | req_data) ::
-          Response.t() | no_return
-  def put!(%Config{} = config, path, req_data \\ nil) do
-    request!(config, :put, path, req_data)
-  end
-
-  @doc """
-  Dispatch a GET request to the path at the configured endpoint.
-  """
-  @spec delete(Config.t(), path) ::
-          {:ok, Response.t()} | {:error, error}
-  def delete(%Config{} = config, path) do
-    request(config, :delete, path)
+  def get(%Config{} = config, location) do
+    request(config, :get, location)
   end
 
   @doc """
   Dispatch a GET request to the path at the configured endpoint. Raises when
   the request fails.
   """
-  @spec delete!(Config.t(), path) :: Response.t() | no_return
-  def delete!(%Config{} = config, path) do
-    request!(config, :delete, path)
+  @spec get!(Config.t(), location) :: Response.t() | no_return
+  def get!(%Config{} = config, location) do
+    request!(config, :get, location)
+  end
+
+  @doc """
+  Dispatch a POST request to the path at the configured endpoint using the
+  specified request data.
+  """
+  @spec post(Config.t(), location, nil | req_data) ::
+          {:ok, Response.t()} | {:error, error}
+  def post(%Config{} = config, location, req_data \\ nil) do
+    request(config, :post, location, req_data)
+  end
+
+  @doc """
+  Dispatch a POST request to the path at the configured endpoint using the
+  specified request data. Raises when the request fails.
+  """
+  @spec post!(Config.t(), location, nil | req_data) ::
+          Response.t() | no_return
+  def post!(%Config{} = config, location, req_data \\ nil) do
+    request!(config, :post, location, req_data)
+  end
+
+  @doc """
+  Dispatch a PUT request to the path at the configured endpoint using the
+  specified request data.
+  """
+  @spec put(Config.t(), location, nil | req_data) ::
+          {:ok, Response.t()} | {:error, error}
+  def put(%Config{} = config, location, req_data \\ nil) do
+    request(config, :put, location, req_data)
+  end
+
+  @doc """
+  Dispatch a PUT request to the path at the configured endpoint using the
+  specified request data. Raises when the request fails.
+  """
+  @spec put!(Config.t(), location, nil | req_data) ::
+          Response.t() | no_return
+  def put!(%Config{} = config, location, req_data \\ nil) do
+    request!(config, :put, location, req_data)
+  end
+
+  @doc """
+  Dispatch a GET request to the path at the configured endpoint.
+  """
+  @spec delete(Config.t(), location) ::
+          {:ok, Response.t()} | {:error, error}
+  def delete(%Config{} = config, location) do
+    request(config, :delete, location)
+  end
+
+  @doc """
+  Dispatch a GET request to the path at the configured endpoint. Raises when
+  the request fails.
+  """
+  @spec delete!(Config.t(), location) :: Response.t() | no_return
+  def delete!(%Config{} = config, location) do
+    request!(config, :delete, location)
   end
 end
