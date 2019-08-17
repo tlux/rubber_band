@@ -1,8 +1,8 @@
-defmodule RubberBand.UtilsTest do
+defmodule RubberBand.Client.UtilsTest do
   use ExUnit.Case, async: true
 
-  alias RubberBand.Config
-  alias RubberBand.Utils
+  alias RubberBand.Client.Config
+  alias RubberBand.Client.Utils
 
   describe "split_path/1" do
     test "get empty list when arg nil" do

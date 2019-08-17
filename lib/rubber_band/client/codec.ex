@@ -1,8 +1,8 @@
-defmodule RubberBand.Codec do
+defmodule RubberBand.Client.Codec do
   @moduledoc false
 
-  alias RubberBand.CodecError
-  alias RubberBand.Config
+  alias RubberBand.Client.CodecError
+  alias RubberBand.Client.Config
 
   @doc """
   Decodes data using the JSON codec from the given config.

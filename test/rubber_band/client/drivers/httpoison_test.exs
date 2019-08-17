@@ -1,8 +1,8 @@
-defmodule RubberBand.Drivers.HTTPoisonTest do
+defmodule RubberBand.Client.Drivers.HTTPoisonTest do
   use ExUnit.Case
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
-  alias RubberBand.Drivers.HTTPoison, as: HTTPoisonDriver
+  alias RubberBand.Client.Drivers.HTTPoison, as: HTTPoisonDriver
 
   @base_url "https://jsonplaceholder.typicode.com"
 

@@ -1,4 +1,4 @@
-defmodule RubberBand.CodecError do
+defmodule RubberBand.Client.CodecError do
   @type t :: %__MODULE__{
           data: any,
           operation: :decode | :encode,

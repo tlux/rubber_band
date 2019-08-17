@@ -4,21 +4,39 @@ defmodule RubberBand.ClientTest do
   import Mox
 
   alias RubberBand.Client
-  alias RubberBand.Codec
-  alias RubberBand.CodecError
-  alias RubberBand.Config
-  alias RubberBand.Drivers.Mock, as: MockDriver
-  alias RubberBand.RequestError
-  alias RubberBand.Response
-  alias RubberBand.ResponseError
-  alias RubberBand.Utils
-
-  setup :verify_on_exit!
+  alias RubberBand.Client.Codec
+  alias RubberBand.Client.CodecError
+  alias RubberBand.Client.Config
+  alias RubberBand.Client.Drivers.Mock, as: MockDriver
+  alias RubberBand.Client.RequestError
+  alias RubberBand.Client.Response
+  alias RubberBand.Client.ResponseError
+  alias RubberBand.Client.Utils
 
   @config %Config{driver: MockDriver, timeout: 5000}
   @opts [recv_timeout: 5000]
   @path "my-index/_search"
   @url Utils.build_url(@config, @path)
+
+  setup :verify_on_exit!
+
+  describe "use" do
+    test "success" do
+      defmodule SuccessTestClient do
+        use Client, otp_app: :rubber_band
+      end
+
+      assert Client in SuccessTestClient.__info__(:attributes)[:behaviour]
+    end
+
+    test "raise when no :otp_app specified" do
+      assert_raise KeyError, "key :otp_app not found in: []", fn ->
+        defmodule ErrorTestClient do
+          use Client
+        end
+      end
+    end
+  end
 
   describe "request/3" do
     test "success" do

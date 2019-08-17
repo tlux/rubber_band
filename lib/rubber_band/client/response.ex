@@ -1,15 +1,15 @@
-defmodule RubberBand.Response do
+defmodule RubberBand.Client.Response do
   @moduledoc """
   The response to an Elasticsearch request.
   """
+
+  defstruct [:content_type, :data, :status_code]
 
   @type t :: %__MODULE__{
           content_type: String.t(),
           data: binary | %{optional(atom) => any},
           status_code: integer
         }
-
-  defstruct [:content_type, :data, :status_code]
 
   @doc """
   Gets the hits from the response.

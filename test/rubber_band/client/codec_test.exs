@@ -3,9 +3,9 @@ defmodule RubberBand.Client.CodecTest do
 
   import Mox
 
-  alias RubberBand.Codec
-  alias RubberBand.CodecError
-  alias RubberBand.Config
+  alias RubberBand.Client.Codec
+  alias RubberBand.Client.CodecError
+  alias RubberBand.Client.Config
 
   setup :verify_on_exit!
 

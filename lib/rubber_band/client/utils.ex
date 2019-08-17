@@ -1,8 +1,8 @@
-defmodule RubberBand.Utils do
+defmodule RubberBand.Client.Utils do
   @moduledoc false
 
-  alias RubberBand.Client
-  alias RubberBand.Config
+  alias RubberBand.Client.Client
+  alias RubberBand.Client.Config
 
   @separator "/"
 

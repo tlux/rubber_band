@@ -1,4 +1,4 @@
-defmodule RubberBand.Driver do
+defmodule RubberBand.Client.Driver do
   @moduledoc """
   A behavior that must be implemented by custom Elasticsearch drivers. A driver
   sends a request to the Elasticsearch endpoint and retrieves the particular
@@ -7,13 +7,22 @@ defmodule RubberBand.Driver do
 
   alias RubberBand.Client
 
+  @typedoc """
+  A type representing request headers.
+  """
   @type req_headers ::
           Keyword.t(binary)
           | [{String.t(), binary}]
           | %{optional(atom | String.t()) => binary}
 
+  @typedoc """
+  A type representing response headers.
+  """
   @type resp_headers :: [{String.t(), binary}]
 
+  @typedoc """
+  A type representing successful response data.
+  """
   @type resp :: %{
           required(:status_code) => non_neg_integer,
           required(:headers) => resp_headers,
@@ -21,6 +30,9 @@ defmodule RubberBand.Driver do
           optional(atom) => any
         }
 
+  @typedoc """
+  A type representing failed response data.
+  """
   @type error :: %{:reason => any, optional(atom) => any}
 
   @doc """

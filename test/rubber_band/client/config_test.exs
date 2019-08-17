@@ -1,7 +1,7 @@
 defmodule RubberBand.Client.ConfigTest do
   use ExUnit.Case, async: true
 
-  alias RubberBand.Config
+  alias RubberBand.Client.Config
 
   describe "new/1" do
     test "build with config" do
@@ -15,7 +15,7 @@ defmodule RubberBand.Client.ConfigTest do
 
       assert config == %Config{
                base_url: "http://localhost:9200",
-               driver: RubberBand.Drivers.HTTPoison,
+               driver: RubberBand.Client.Drivers.HTTPoison,
                json_codec: Jason,
                timeout: 15_000
              }
@@ -25,7 +25,7 @@ defmodule RubberBand.Client.ConfigTest do
 
     test "build with list" do
       base_url = "http://elasticsearch/path"
-      driver = RubberBand.Drivers.Mock
+      driver = RubberBand.Client.Drivers.Mock
       json_codec = MockJSONCodec
       timeout = :infinity
 
@@ -44,7 +44,7 @@ defmodule RubberBand.Client.ConfigTest do
 
     test "build with map" do
       base_url = "http://elasticsearch/path"
-      driver = RubberBand.Drivers.Mock
+      driver = RubberBand.Client.Drivers.Mock
       json_codec = MockJSONCodec
       timeout = :infinity
 

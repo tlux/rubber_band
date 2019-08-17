@@ -1,11 +1,11 @@
-defmodule RubberBand.Config do
+defmodule RubberBand.Client.Config do
   @moduledoc """
   A helper module to retrieve configuration values and defaults for the search
   engine.
   """
 
   defstruct base_url: "http://localhost:9200",
-            driver: RubberBand.Drivers.HTTPoison,
+            driver: RubberBand.Client.Drivers.HTTPoison,
             json_codec: Jason,
             timeout: 15_000
 

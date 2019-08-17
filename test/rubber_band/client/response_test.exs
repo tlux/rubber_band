@@ -1,7 +1,7 @@
-defmodule RubberBand.ResponseTest do
+defmodule RubberBand.Client.ResponseTest do
   use ExUnit.Case, async: true
 
-  alias RubberBand.Response
+  alias RubberBand.Client.Response
 
   describe "hits/1" do
     test "get hits from data if hits present" do

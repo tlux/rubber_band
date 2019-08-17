@@ -1,7 +1,7 @@
 defmodule RubberBand.RequestErrorTest do
   use ExUnit.Case, async: true
 
-  alias RubberBand.RequestError
+  alias RubberBand.Client.RequestError
 
   @error %RequestError{reason: :timeout}
 

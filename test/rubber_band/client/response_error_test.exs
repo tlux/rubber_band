@@ -1,7 +1,7 @@
-defmodule RubberBand.ResponseErrorTest do
+defmodule RubberBand.Client.ResponseErrorTest do
   use ExUnit.Case, async: true
 
-  alias RubberBand.ResponseError
+  alias RubberBand.Client.ResponseError
 
   @error %ResponseError{
     col: 4,

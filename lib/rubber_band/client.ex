@@ -5,13 +5,13 @@ defmodule RubberBand.Client do
   """
 
   alias __MODULE__
-  alias RubberBand.Codec
-  alias RubberBand.CodecError
-  alias RubberBand.Config
-  alias RubberBand.RequestError
-  alias RubberBand.Response
-  alias RubberBand.ResponseError
-  alias RubberBand.Utils
+  alias RubberBand.Client.Codec
+  alias RubberBand.Client.CodecError
+  alias RubberBand.Client.Config
+  alias RubberBand.Client.RequestError
+  alias RubberBand.Client.Response
+  alias RubberBand.Client.ResponseError
+  alias RubberBand.Client.Utils
 
   @typedoc """
   A type that refers to a HTTP method to perform the request with.
