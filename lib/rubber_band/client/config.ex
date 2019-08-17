@@ -1,7 +1,6 @@
 defmodule RubberBand.Client.Config do
   @moduledoc """
-  A helper module to retrieve configuration values and defaults for the search
-  engine.
+  A helper module to retrieve configuration values and defaults for the client.
   """
 
   defstruct base_url: "http://localhost:9200",

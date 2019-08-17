@@ -1,6 +1,7 @@
 defmodule RubberBand.Client.RequestError do
   @moduledoc """
-  An error that is returned or raised when the search API returned an error.
+  An error that is returned or raised when the search API returned an error due
+  to a bad request.
   """
 
   defexception [:reason]

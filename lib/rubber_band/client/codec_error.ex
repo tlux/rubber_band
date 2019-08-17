@@ -1,4 +1,9 @@
 defmodule RubberBand.Client.CodecError do
+  @moduledoc """
+  An error that is returned or raised when decoding of response data or encoding
+  of request data fails.
+  """
+
   @type t :: %__MODULE__{
           data: any,
           operation: :decode | :encode,

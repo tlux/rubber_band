@@ -1,6 +1,6 @@
 defmodule RubberBand.Client.Response do
   @moduledoc """
-  The response to an Elasticsearch request.
+  A struct containing the response data for an Elasticsearch request.
   """
 
   defstruct [:content_type, :data, :status_code]
