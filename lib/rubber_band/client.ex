@@ -18,11 +18,16 @@ defmodule RubberBand.Client do
         use RubberBand.Client, otp_app: :my_app
       end
 
-  Don't forget to add the configuration to your confix.exe.
+  Don't forget to add the configuration to your config.exs.
 
       use Mix.Config
 
       config :my_app, MyCustomClient, base_url: "http://localhost:9201"
+
+  Then, use your client.
+
+      iex> MyCustomClient.get!("_cat/health")
+      #RubberBand.Client.Response<...>
   """
 
   alias __MODULE__
