@@ -16,16 +16,15 @@ defmodule RubberBand.ClientTest do
   setup :verify_on_exit!
 
   @config %Config{driver: MockDriver, timeout: 5000}
+  @opts [recv_timeout: 5000]
+  @path "my-index/_search"
+  @url Utils.build_url(@config, @path)
 
   describe "request/3" do
-    test "call driver" do
-      verb = :get
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
+    test "success" do
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
+      expect(MockDriver, :request, fn :get, @url, "", [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -34,7 +33,7 @@ defmodule RubberBand.ClientTest do
          }}
       end)
 
-      assert Client.request(@config, verb, path) ==
+      assert Client.request(@config, :get, @path) ==
                {:ok,
                 %Response{
                   content_type: "application/json",
@@ -44,13 +43,9 @@ defmodule RubberBand.ClientTest do
     end
 
     test "decode error" do
-      verb = :put
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
+      expect(MockDriver, :request, fn :put, @url, "", [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -60,30 +55,21 @@ defmodule RubberBand.ClientTest do
       end)
 
       assert {:error, %CodecError{data: resp_body, operation: :decode}} =
-               Client.request(@config, verb, path)
+               Client.request(@config, :put, @path)
     end
 
     test "request error" do
-      verb = :post
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
+      expect(MockDriver, :request, fn :head, @url, "", [], @opts ->
         {:error, %{reason: reason}}
       end)
 
-      assert Client.request(@config, verb, path) ==
+      assert Client.request(@config, :head, @path) ==
                {:error, %RequestError{reason: reason}}
     end
 
     test "response error" do
-      verb = :delete
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
-
       resp_data = %{
         error: %{
           col: 1,
@@ -93,7 +79,7 @@ defmodule RubberBand.ClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -102,7 +88,7 @@ defmodule RubberBand.ClientTest do
          }}
       end)
 
-      assert Client.request(@config, verb, path) ==
+      assert Client.request(@config, :delete, @path) ==
                {:error,
                 %ResponseError{
                   col: 1,
@@ -116,14 +102,10 @@ defmodule RubberBand.ClientTest do
   end
 
   describe "request!/3" do
-    test "call driver" do
-      verb = :get
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
+    test "success" do
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
+      expect(MockDriver, :request, fn :get, @url, "", [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -132,7 +114,7 @@ defmodule RubberBand.ClientTest do
          }}
       end)
 
-      assert Client.request!(@config, verb, path) ==
+      assert Client.request!(@config, :get, @path) ==
                %Response{
                  content_type: "application/json",
                  data: resp_data,
@@ -141,13 +123,9 @@ defmodule RubberBand.ClientTest do
     end
 
     test "decode error" do
-      verb = :put
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
+      expect(MockDriver, :request, fn :put, @url, "", [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -157,33 +135,23 @@ defmodule RubberBand.ClientTest do
       end)
 
       assert_raise CodecError, "Unable to decode data", fn ->
-        Client.request!(@config, verb, path)
+        Client.request!(@config, :put, @path)
       end
     end
 
     test "request error" do
-      verb = :post
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
-
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
+      expect(MockDriver, :request, fn :post, @url, "", [], @opts ->
         {:error, %{reason: reason}}
       end)
 
       assert_raise RequestError, "Request error: #{reason}", fn ->
-        Client.request!(@config, verb, path)
+        Client.request!(@config, :post, @path)
       end
     end
 
     test "response error" do
-      verb = :delete
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
-
       resp_data = %{
         error: %{
           col: 1,
@@ -193,7 +161,7 @@ defmodule RubberBand.ClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn ^verb, ^url, "", [], ^opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -205,22 +173,18 @@ defmodule RubberBand.ClientTest do
       assert_raise ResponseError,
                    "Response error: Something went wrong (unexpected_error)",
                    fn ->
-                     Client.request!(@config, verb, path)
+                     Client.request!(@config, :delete, @path)
                    end
     end
   end
 
   describe "request/4" do
-    test "call driver" do
-      verb = :get
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
+    test "success" do
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn ^verb, ^url, ^req_body, [], ^opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -229,7 +193,7 @@ defmodule RubberBand.ClientTest do
          }}
       end)
 
-      assert Client.request(@config, verb, path, req_data) ==
+      assert Client.request(@config, :post, @path, req_data) ==
                {:ok,
                 %Response{
                   content_type: "application/json",
@@ -239,24 +203,18 @@ defmodule RubberBand.ClientTest do
     end
 
     test "encode error" do
-      verb = :post
-      path = "my-index/_search"
       req_data = {:some, :undecodable, "data"}
 
       assert {:error, %CodecError{data: req_data, operation: :encode}} =
-               Client.request(@config, verb, path, req_data)
+               Client.request(@config, :post, @path, req_data)
     end
 
     test "decode error" do
-      verb = :put
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn ^verb, ^url, ^req_body, [], ^opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -266,31 +224,23 @@ defmodule RubberBand.ClientTest do
       end)
 
       assert {:error, %CodecError{data: resp_body, operation: :decode}} =
-               Client.request(@config, verb, path, req_data)
+               Client.request(@config, :put, @path, req_data)
     end
 
     test "request error" do
-      verb = :post
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn ^verb, ^url, ^req_body, [], ^opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
         {:error, %{reason: reason}}
       end)
 
-      assert Client.request(@config, verb, path, req_data) ==
+      assert Client.request(@config, :put, @path, req_data) ==
                {:error, %RequestError{reason: reason}}
     end
 
     test "response error" do
-      verb = :delete
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
 
@@ -303,7 +253,7 @@ defmodule RubberBand.ClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn ^verb, ^url, ^req_body, [], ^opts ->
+      expect(MockDriver, :request, fn :delete, @url, ^req_body, [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -312,7 +262,7 @@ defmodule RubberBand.ClientTest do
          }}
       end)
 
-      assert Client.request(@config, verb, path, req_data) ==
+      assert Client.request(@config, :delete, @path, req_data) ==
                {:error,
                 %ResponseError{
                   col: 1,
@@ -326,16 +276,12 @@ defmodule RubberBand.ClientTest do
   end
 
   describe "request!/4" do
-    test "call driver" do
-      verb = :get
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
+    test "success" do
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn ^verb, ^url, ^req_body, [], ^opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -344,7 +290,7 @@ defmodule RubberBand.ClientTest do
          }}
       end)
 
-      assert Client.request!(@config, verb, path, req_data) ==
+      assert Client.request!(@config, :post, @path, req_data) ==
                %Response{
                  content_type: "application/json",
                  data: resp_data,
@@ -353,25 +299,19 @@ defmodule RubberBand.ClientTest do
     end
 
     test "encode error" do
-      verb = :post
-      path = "my-index/_search"
       req_data = {:some, :undecodable, "data"}
 
       assert_raise CodecError, "Unable to encode data", fn ->
-        Client.request!(@config, verb, path, req_data)
+        Client.request!(@config, :post, @path, req_data)
       end
     end
 
     test "decode error" do
-      verb = :put
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn ^verb, ^url, ^req_body, [], ^opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -381,33 +321,25 @@ defmodule RubberBand.ClientTest do
       end)
 
       assert_raise CodecError, "Unable to decode data", fn ->
-        Client.request!(@config, verb, path, req_data)
+        Client.request!(@config, :put, @path, req_data)
       end
     end
 
     test "request error" do
-      verb = :post
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn ^verb, ^url, ^req_body, [], ^opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
         {:error, %{reason: reason}}
       end)
 
       assert_raise RequestError, "Request error: #{reason}", fn ->
-        Client.request!(@config, verb, path, req_data)
+        Client.request!(@config, :put, @path, req_data)
       end
     end
 
     test "response error" do
-      verb = :delete
-      path = "my-index/_search"
-      url = Utils.build_url(@config, path)
-      opts = [recv_timeout: @config.timeout]
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
 
@@ -420,7 +352,7 @@ defmodule RubberBand.ClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn ^verb, ^url, ^req_body, [], ^opts ->
+      expect(MockDriver, :request, fn :delete, @url, ^req_body, [], @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -432,8 +364,12 @@ defmodule RubberBand.ClientTest do
       assert_raise ResponseError,
                    "Response error: Something went wrong (unexpected_error)",
                    fn ->
-                     Client.request!(@config, verb, path, req_data)
+                     Client.request!(@config, :delete, @path, req_data)
                    end
     end
+  end
+
+  describe "head/2" do
+    test "success"
   end
 end

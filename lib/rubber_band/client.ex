@@ -40,29 +40,70 @@ defmodule RubberBand.Client do
   @type req_data ::
           String.t() | Keyword.t() | %{optional(atom | String.t()) => any}
 
+  @typedoc """
+  Type defining an error that be be returned or raised when sending a request to
+  a resource.
+  """
   @type error :: CodecError.t() | RequestError.t() | ResponseError.t()
 
+  @doc """
+  Dispatch a request to the path at the configured endpoint using the specified
+  request method.
+  """
   @callback request(verb, path) :: {:ok, Response.t()} | {:error, error}
 
+  @doc """
+  Dispatch a request to the path at the configured endpoint using the specified
+  request method and data.
+  """
   @callback request(verb, path, req_data) ::
               {:ok, Response.t()} | {:error, error}
 
+  @doc """
+  Dispatch a request to the path at the configured endpoint using the specified
+  request method. Raises when the request fails.
+  """
   @callback request!(verb, path) :: Response.t() | no_return
 
+  @doc """
+  Dispatch a request to the path at the configured endpoint using the specified
+  request method and data. Raises when the request fails.
+  """
   @callback request!(verb, path, req_data) :: Response.t() | no_return
 
+  @doc """
+  Dispatch a HEAD request to the path at the configured endpoint.
+  """
   @callback head(path) :: {:ok, Response.t()} | {:error, error}
 
+  @doc """
+  Dispatch a HEAD request to the path at the configured endpoint. Raises when
+  the request fails.
+  """
   @callback head!(path) :: Response.t() | no_return
 
+  @doc """
+  Dispatch a GET request to the path at the configured endpoint.
+  """
   @callback get(path) :: {:ok, Response.t()} | {:error, error}
 
+  @doc """
+  Dispatch a GET request to the path at the configured endpoint. Raises when
+  the request fails.
+  """
   @callback get!(path) :: Response.t() | no_return
 
+  @doc """
+  Dispatch a POST request to the path at the configured endpoint.
+  """
   @callback post(path) :: {:ok, Response.t()} | {:error, error}
 
   @callback post(path, req_data) :: {:ok, Response.t()} | {:error, error}
 
+  @doc """
+  Dispatch a POST request to the path at the configured endpoint. Raises when
+  the request fails.
+  """
   @callback post!(path) :: Response.t() | no_return
 
   @callback post!(path, req_data) :: Response.t() | no_return
