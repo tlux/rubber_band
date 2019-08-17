@@ -2,6 +2,27 @@ defmodule RubberBand.Client do
   @moduledoc """
   A low-level client that provides functions to retrieve and manage data from
   Elasticsearch.
+
+  ## Usage
+
+  You can either call the client directly if you have a config object.
+
+      iex> cfg = %RubberBand.Client.Config{base_url: "http://localhost:9201"}
+      ...> RubberBand.Client.get!(cfg, "_cat/health")
+      #RubberBand.Client.Response<...>
+
+  Or you can `use` this module to build your own custom client and obtain values
+  from the application config.
+
+      defmodule MyCustomClient
+        use RubberBand.Client, otp_app: :my_app
+      end
+
+  Don't forget to add the configuration to your confix.exe.
+
+      use Mix.Config
+
+      config :my_app, MyCustomClient, base_url: "http://localhost:9201"
   """
 
   alias __MODULE__
