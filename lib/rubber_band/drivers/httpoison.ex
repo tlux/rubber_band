@@ -8,7 +8,7 @@ defmodule RubberBand.Drivers.HTTPoison do
 
   @impl true
   def request(verb, url, body, headers, opts) do
-    # {:ok, _} = Application.ensure_all_started(:httpoison)
+    {:ok, _} = Application.ensure_all_started(:httpoison)
     HTTPoison.request(verb, URI.to_string(url), body, headers, opts)
   end
 end
