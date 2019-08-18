@@ -1,5 +1,5 @@
 defmodule RubberBand.Stream do
-  defstruct(:config, :index, :search_opts: %{})
+  defstruct [:config, :index, search_opts: %{}]
 
   @type t :: %__MODULE__{
           config: RubberBand.Config.t(),
@@ -27,7 +27,7 @@ defmodule RubberBand.Stream do
     end
 
     def slice(_stream) do
-      {:error, module()}
+      {:error, __MODULE__}
     end
   end
 end
