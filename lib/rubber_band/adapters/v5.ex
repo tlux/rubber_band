@@ -3,6 +3,10 @@ defmodule RubberBand.Adapters.V5 do
 
   alias RubberBand.Client
   alias RubberBand.Doc
+  alias RubberBand.Hit
+  alias RubberBand.Hits
+  alias RubberBand.GetResult
+  alias RubberBand.SearchResult
 
   @type_name "doc"
 
@@ -14,29 +18,31 @@ defmodule RubberBand.Adapters.V5 do
     end
   end
 
+  def create_index(config, index_name, settings, mappings) do
+    create_index(config, index_name, index_name, settings, mappings)
+  end
+
   @impl true
   def create_index(config, index_name, index_alias, settings, mappings) do
     with :ok <- drop_index(config, index_alias),
          :ok <-
-           do_create_index(config, index_name, settings, mappings, %{
-             aliases: %{index_alias => %{}}
-           }) do
+           do_create_index(config, index_name, index_alias, settings, mappings) do
       :ok
     end
   end
 
-  defp do_create_index(config, index_name, settings, mappings, additional_data) do
-    opts =
-      Map.merge(
-        %{
-          settings: Map.put(settings, :"index.mapping.single_type", true),
-          mappings: %{@type_name => mappings}
-        },
-        additional_data
-      )
+  defp do_create_index(config, index_name, index_alias, settings, mappings) do
+    opts = %{
+      settings: Map.put(settings, :"index.mapping.single_type", true),
+      mappings: %{@type_name => mappings},
+      aliases: get_alias_opts(index_name, index_alias)
+    }
 
     with {:ok, _} <- Client.put(config, index_name, opts), do: :ok
   end
+
+  defp get_alias_opts(index_name, index_name), do: %{}
+  defp get_alias_opts(_index_name, index_alias), do: %{index_alias => %{}}
 
   @impl true
   def create_and_populate_index(
@@ -47,7 +53,8 @@ defmodule RubberBand.Adapters.V5 do
         mappings,
         populate_fun
       ) do
-    with :ok <- do_create_index(config, index_name, settings, mappings, %{}),
+    with :ok <-
+           do_create_index(config, index_name, index_name, settings, mappings),
          :ok <- populate_index(config, index_name, populate_fun),
          :ok <- create_alias(config, index_name, index_alias) do
       :ok
@@ -115,15 +122,44 @@ defmodule RubberBand.Adapters.V5 do
   @impl true
   def get_doc(config, index_name_or_alias, doc_id) do
     case Client.get(config, [index_name_or_alias, @type_name, doc_id]) do
-      {:ok, %{data: data}} -> %Doc{id: data._id, source: data._source}
-      {:error, %{status_code: 404}} -> nil
-      {:error, error} -> raise error
+      {:ok, %{data: data}} ->
+        %GetResult{
+          doc: %{id: data._id, source: data._source},
+          version: data._version
+        }
+
+      {:error, %{status_code: 404}} ->
+        nil
+
+      {:error, error} ->
+        raise error
     end
   end
 
   @impl true
   def search(config, index_name_or_alias, search_opts) do
-    # TODO
+    case Client.post(
+           config,
+           [index_name_or_alias, @type_name, "_search"],
+           search_opts
+         ) do
+      {:ok, resp} ->
+        entries =
+          Enum.map(resp.data.hits.hits, fn hit ->
+            %Hit{doc: %Doc{id: hit._id, source: hit._source}, score: hit._score}
+          end)
+
+        total = resp.data.hits.total
+        max_score = resp.data.hits.max_score
+
+        {:ok,
+         %SearchResult{
+           hits: %Hits{entries: entries, total: total, max_score: max_score}
+         }}
+
+      {:error, error} ->
+        {:error, error}
+    end
   end
 
   @impl true
@@ -131,7 +167,7 @@ defmodule RubberBand.Adapters.V5 do
     with {:ok, _} <-
            Client.put(
              config,
-             [index_name_or_alias, @type_name, doc.id],
+             {[index_name_or_alias, @type_name, doc.id], refresh: "wait_for"},
              doc.source
            ) do
       :ok
@@ -141,7 +177,10 @@ defmodule RubberBand.Adapters.V5 do
   @impl true
   def delete_doc(config, index_name_or_alias, doc_id) do
     with {:ok, _} <-
-           Client.delete(config, [index_name_or_alias, @type_name, doc_id]) do
+           Client.delete(
+             config,
+             {[index_name_or_alias, @type_name, doc_id], refresh: "wait_for"}
+           ) do
       :ok
     end
   end

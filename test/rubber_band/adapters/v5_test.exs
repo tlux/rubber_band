@@ -5,6 +5,9 @@ defmodule RubberBand.Adapters.V5Test do
   alias RubberBand.Client
   alias RubberBand.Client.Config
   alias RubberBand.Doc
+  alias RubberBand.GetResult
+  alias RubberBand.Hit
+  alias RubberBand.SearchResult
 
   @index_name "test-people"
 
@@ -131,18 +134,17 @@ defmodule RubberBand.Adapters.V5Test do
 
   describe "get_doc/3" do
     test "get doc", context do
-      doc_id = "1337"
-
       %{status_code: 200} = Client.put!(context.config, @index_name)
 
-      %{status_code: 201} =
-        Client.put!(context.config, [@index_name, "doc", doc_id], %{
-          "name" => "Hello World"
-        })
+      doc_id = "1337"
+      doc_source = %{name: "Hello World"}
 
-      assert V5.get_doc(context.config, @index_name, doc_id) == %Doc{
-               id: "1337",
-               source: %{name: "Hello World"}
+      %{status_code: 201} =
+        Client.put!(context.config, [@index_name, "doc", doc_id], doc_source)
+
+      assert V5.get_doc(context.config, @index_name, doc_id) == %GetResult{
+               doc: %{id: doc_id, source: doc_source},
+               version: 1
              }
     end
 
@@ -153,6 +155,27 @@ defmodule RubberBand.Adapters.V5Test do
   end
 
   describe "search/3" do
+    test "search with hits", context do
+      %{status_code: 200} = Client.put!(context.config, @index_name)
+
+      doc = %Doc{
+        id: "1337",
+        source: %{name: "Hello World"}
+      }
+
+      :ok = V5.put_doc(context.config, @index_name, doc)
+
+      assert {:ok, %SearchResult{hits: hits}} =
+               V5.search(context.config, @index_name, %{
+                 query: %{match: %{name: "Hello"}}
+               })
+
+      assert hits.entries == [
+               %Hit{doc: doc, score: 0.25811607}
+             ]
+    end
+
+    test "search with aggregations"
   end
 
   describe "put_doc/3" do
@@ -165,25 +188,35 @@ defmodule RubberBand.Adapters.V5Test do
       }
 
       assert :ok = V5.put_doc(context.config, @index_name, doc)
-      assert V5.get_doc(context.config, @index_name, doc.id) == doc
+
+      data = %{
+        _id: doc.id,
+        _index: "test-people",
+        _source: doc.source,
+        _type: "doc",
+        _version: 1,
+        found: true
+      }
+
+      assert %{data: ^data} =
+               Client.get!(context.config, [@index_name, "doc", doc.id])
     end
   end
 
   describe "delete_doc/2" do
     test "delete doc", context do
-      doc_id = "1337"
+      doc = %{
+        id: "1337",
+        source: %{name: "Hello World"}
+      }
 
       %{status_code: 200} = Client.put!(context.config, @index_name)
 
-      :ok =
-        V5.put_doc(context.config, @index_name, %Doc{
-          id: doc_id,
-          source: %{name: "Hello World"}
-        })
+      :ok = V5.put_doc(context.config, @index_name, doc)
 
-      assert V5.doc_exists?(context.config, @index_name, doc_id)
-      assert :ok = V5.delete_doc(context.config, @index_name, doc_id)
-      refute V5.doc_exists?(context.config, @index_name, doc_id)
+      assert V5.doc_exists?(context.config, @index_name, doc.id)
+      assert :ok = V5.delete_doc(context.config, @index_name, doc.id)
+      refute V5.doc_exists?(context.config, @index_name, doc.id)
     end
   end
 

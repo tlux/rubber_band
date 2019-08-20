@@ -6,13 +6,15 @@ defmodule RubberBand.Client.Config do
   defstruct base_url: "http://localhost:9200",
             driver: RubberBand.Client.Drivers.HTTPoison,
             json_codec: Jason,
-            timeout: 15_000
+            timeout: 15_000,
+            wait_for_refresh: true
 
   @type t :: %__MODULE__{
           base_url: String.t() | URI.t(),
           driver: module,
           json_codec: module,
-          timeout: timeout
+          timeout: timeout,
+          wait_for_refresh: boolean
         }
 
   @doc """

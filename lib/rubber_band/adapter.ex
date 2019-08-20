@@ -1,7 +1,7 @@
 defmodule RubberBand.Adapter do
-  alias RubberBand.BulkOperation
   alias RubberBand.Client.Config
   alias RubberBand.Doc
+  alias RubberBand.GetResult
   alias RubberBand.SearchResult
 
   @doc """
@@ -13,7 +13,7 @@ defmodule RubberBand.Adapter do
             ) :: boolean
 
   @doc """
-  Creates an index with the given name.
+  Creates an index with the given name and an alias.
   """
   @callback create_index(
               config :: Config.t(),
@@ -59,7 +59,7 @@ defmodule RubberBand.Adapter do
               config :: Config.t(),
               index_name_or_alias :: String.t(),
               doc_id :: term
-            ) :: nil | Doc.t()
+            ) :: nil | GetResult.t()
 
   @doc """
   Performs a search on the given index.
@@ -69,7 +69,7 @@ defmodule RubberBand.Adapter do
               index_name_or_alias :: String.t(),
               search_opts :: RubberBand.search_opts()
             ) ::
-              {:ok, RubberBand.SearchResult.t()}
+              {:ok, SearchResult.t()}
               | {:error, RubberBand.error()}
 
   @doc """
