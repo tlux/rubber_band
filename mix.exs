@@ -52,6 +52,7 @@ defmodule RubberBand.MixProject do
     [
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false},
+      {:es_client, "~> 0.1"},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:excoveralls, "~> 0.10", only: :test},
       {:exvcr, "~> 0.10", only: :test},
