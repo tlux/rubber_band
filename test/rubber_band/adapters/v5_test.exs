@@ -2,8 +2,7 @@ defmodule RubberBand.Adapters.V5Test do
   use ExUnit.Case, async: false
 
   alias RubberBand.Adapters.V5
-  alias RubberBand.Client
-  alias RubberBand.Client.Config
+  alias RubberBand.Config
   alias RubberBand.Doc
   alias RubberBand.GetResult
   alias RubberBand.Hit
@@ -12,7 +11,10 @@ defmodule RubberBand.Adapters.V5Test do
   @index_name "test-people"
 
   setup do
-    config = %Config{base_url: "http://localhost:9200"}
+    config = %Config{
+      client: ESClient.Config.new(base_url: "http://localhost:9200")
+    }
+
     Client.delete(config, "test-*")
     {:ok, config: config}
   end

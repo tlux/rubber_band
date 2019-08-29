@@ -1,5 +1,5 @@
 defmodule RubberBand.Adapter do
-  alias RubberBand.Client.Config
+  alias RubberBand.Config
   alias RubberBand.Doc
   alias RubberBand.GetResult
   alias RubberBand.SearchResult
@@ -106,7 +106,5 @@ defmodule RubberBand.Adapter do
               config :: Config.t(),
               index_name_or_alias :: String.t(),
               operations :: Enum.t() | [RubberBand.bulk_operation()]
-            ) ::
-              {:ok, RubberBand.Client.Response.t()}
-              | {:error, RubberBand.error()}
+            ) :: {:ok, ESClient.Response.t()} | {:error, RubberBand.error()}
 end

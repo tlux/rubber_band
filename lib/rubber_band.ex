@@ -5,7 +5,7 @@ defmodule RubberBand do
   alias RubberBand.UnknownIndexError
 
   @type error ::
-          Client.error() | MultipleResultsError.t() | UnknownIndexError.t()
+          ESClient.error() | MultipleResultsError.t() | UnknownIndexError.t()
 
   @type search_opts :: Keyword.t() | %{optional(atom) => any}
 

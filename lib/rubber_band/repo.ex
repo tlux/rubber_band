@@ -106,7 +106,7 @@ defmodule RubberBand.Repo do
           boolean | no_return
   def index_exists?(config, index) do
     index_name = fetch_index_name!(config, index)
-    config.adapter.index_exists?(config.client, index_name)
+    config.adapter.index_exists?(config, index_name)
   end
 
   @spec create_index(
@@ -116,7 +116,7 @@ defmodule RubberBand.Repo do
         ) :: :ok | {:error, RubberBand.error()}
   def create_index(config, index, populate_fun \\ nil) do
     with {:ok, index_name} <- fetch_index_name(config, index) do
-      config.adapter.create_index(config.client, index_name, populate_fun)
+      config.adapter.create_index(config, index_name, populate_fun)
     end
   end
 
@@ -135,7 +135,7 @@ defmodule RubberBand.Repo do
           :ok | {:error, RubberBand.error()}
   def drop_index(config, index) do
     with {:ok, index_name} <- fetch_index_name(config, index) do
-      config.adapter.drop_index(config.client, index_name)
+      config.adapter.drop_index(config, index_name)
     end
   end
 
@@ -154,7 +154,7 @@ defmodule RubberBand.Repo do
         ) :: boolean | no_return
   def doc_exists?(config, index, doc_id) do
     index_name = fetch_index_name!(config, index)
-    config.adapter.doc_exists?(config.client, index_name, doc_id)
+    config.adapter.doc_exists?(config, index_name, doc_id)
   end
 
   @spec get_doc(
@@ -164,7 +164,7 @@ defmodule RubberBand.Repo do
         ) :: nil | Doc.t() | no_return
   def get_doc(config, index, doc_id) do
     index_name = fetch_index_name!(config, index)
-    config.adapter.get_doc(config.client, index_name, doc_id)
+    config.adapter.get_doc(config, index_name, doc_id)
   end
 
   @spec search(
@@ -174,7 +174,7 @@ defmodule RubberBand.Repo do
         ) :: {:ok, SearchResult.t()} | {:error, RubberBand.error()}
   def search(config, index, search_opts \\ %{}) do
     with {:ok, index_name} <- fetch_index_name(config, index) do
-      config.adapter.search(config.client, index_name, search_opts)
+      config.adapter.search(config, index_name, search_opts)
     end
   end
 
@@ -220,7 +220,7 @@ defmodule RubberBand.Repo do
         ) :: :ok | {:error, RubberBand.error()}
   def put_doc(config, index, doc) do
     with {:ok, index_name} <- fetch_index_name(config, index) do
-      config.adapter.put_doc(config.client, index_name, doc)
+      config.adapter.put_doc(config, index_name, doc)
     end
   end
 
@@ -264,7 +264,7 @@ defmodule RubberBand.Repo do
         ) :: :ok | {:error, RubberBand.error()}
   def delete_doc(config, index, doc_id) do
     with {:ok, index_name} <- fetch_index_name(config, index) do
-      config.adapter.delete_doc(config.client, index_name, doc_id)
+      config.adapter.delete_doc(config, index_name, doc_id)
     end
   end
 
@@ -286,11 +286,7 @@ defmodule RubberBand.Repo do
         ) :: :ok | {:error, RubberBand.error()}
   def delete_docs_by_query(config, index, search_opts) do
     with {:ok, index_name} <- fetch_index_name(config, index) do
-      config.adapter.delete_docs_by_query(
-        config.client,
-        index_name,
-        search_opts
-      )
+      config.adapter.delete_docs_by_query(config, index_name, search_opts)
     end
   end
 
@@ -298,12 +294,10 @@ defmodule RubberBand.Repo do
           config :: Config.t(),
           index :: Index.index_key(),
           operations :: [RubberBand.bulk_operation()]
-        ) ::
-          {:ok, RubberBand.Client.Response.t()}
-          | {:error, RubberBand.error()}
+        ) :: {:ok, ESClient.Response.t()} | {:error, RubberBand.error()}
   def bulk(config, index, operations) do
     with {:ok, index_name} <- fetch_index_name(config, index) do
-      config.adapter.bulk(config.client, index_name, operations)
+      config.adapter.bulk(config, index_name, operations)
     end
   end
 

@@ -1,25 +1,20 @@
 defmodule RubberBand.Adapters.V5 do
   @behaviour RubberBand.Adapter
 
-  alias RubberBand.Client
   alias RubberBand.Doc
+  alias RubberBand.GetResult
   alias RubberBand.Hit
   alias RubberBand.Hits
-  alias RubberBand.GetResult
   alias RubberBand.SearchResult
 
   @type_name "doc"
 
   @impl true
   def index_exists?(config, index_name) do
-    case Client.head(config, index_name) do
+    case ESClient.head(config, index_name) do
       {:ok, %{status_code: 200}} -> true
       _ -> false
     end
-  end
-
-  def create_index(config, index_name, settings, mappings) do
-    create_index(config, index_name, index_name, settings, mappings)
   end
 
   @impl true
@@ -31,6 +26,10 @@ defmodule RubberBand.Adapters.V5 do
     end
   end
 
+  defp do_create_index(config, index_name, settings, mappings) do
+    do_create_index(config, index_name, index_name, settings, mappings)
+  end
+
   defp do_create_index(config, index_name, index_alias, settings, mappings) do
     opts = %{
       settings: Map.put(settings, :"index.mapping.single_type", true),
@@ -38,7 +37,7 @@ defmodule RubberBand.Adapters.V5 do
       aliases: get_alias_opts(index_name, index_alias)
     }
 
-    with {:ok, _} <- Client.put(config, index_name, opts), do: :ok
+    with {:ok, _} <- ESClient.put(config, index_name, opts), do: :ok
   end
 
   defp get_alias_opts(index_name, index_name), do: %{}
@@ -53,8 +52,7 @@ defmodule RubberBand.Adapters.V5 do
         mappings,
         populate_fun
       ) do
-    with :ok <-
-           do_create_index(config, index_name, index_name, settings, mappings),
+    with :ok <- do_create_index(config, index_name, settings, mappings),
          :ok <- populate_index(config, index_name, populate_fun),
          :ok <- create_alias(config, index_name, index_alias) do
       :ok
@@ -88,7 +86,7 @@ defmodule RubberBand.Adapters.V5 do
       ]
     }
 
-    with {:ok, _} <- Client.post(config, "_aliases", opts), do: :ok
+    with {:ok, _} <- ESClient.post(config, "_aliases", opts), do: :ok
   end
 
   defp recreate_alias(config, index_name, index_alias) do
@@ -99,12 +97,12 @@ defmodule RubberBand.Adapters.V5 do
       ]
     }
 
-    with {:ok, _} <- Client.post(config, "_aliases", opts), do: :ok
+    with {:ok, _} <- ESClient.post(config, "_aliases", opts), do: :ok
   end
 
   @impl true
   def drop_index(config, index_name_or_alias) do
-    case Client.delete(config, index_name_or_alias) do
+    case ESClient.delete(config, index_name_or_alias) do
       {:ok, _} -> :ok
       {:error, %{status_code: 404}} -> :ok
       error -> error
@@ -113,7 +111,7 @@ defmodule RubberBand.Adapters.V5 do
 
   @impl true
   def doc_exists?(config, index_name_or_alias, doc_id) do
-    case Client.head(config, [index_name_or_alias, @type_name, doc_id]) do
+    case ESClient.head(config, [index_name_or_alias, @type_name, doc_id]) do
       {:ok, %{status_code: 200}} -> true
       _ -> false
     end
@@ -121,7 +119,7 @@ defmodule RubberBand.Adapters.V5 do
 
   @impl true
   def get_doc(config, index_name_or_alias, doc_id) do
-    case Client.get(config, [index_name_or_alias, @type_name, doc_id]) do
+    case ESClient.get(config, [index_name_or_alias, @type_name, doc_id]) do
       {:ok, %{data: data}} ->
         %GetResult{
           doc: %{id: data._id, source: data._source},
@@ -138,7 +136,7 @@ defmodule RubberBand.Adapters.V5 do
 
   @impl true
   def search(config, index_name_or_alias, search_opts) do
-    case Client.post(
+    case ESClient.post(
            config,
            [index_name_or_alias, @type_name, "_search"],
            search_opts
@@ -165,7 +163,7 @@ defmodule RubberBand.Adapters.V5 do
   @impl true
   def put_doc(config, index_name_or_alias, doc) do
     with {:ok, _} <-
-           Client.put(
+           ESClient.put(
              config,
              {[index_name_or_alias, @type_name, doc.id], refresh: "wait_for"},
              doc.source
@@ -177,7 +175,7 @@ defmodule RubberBand.Adapters.V5 do
   @impl true
   def delete_doc(config, index_name_or_alias, doc_id) do
     with {:ok, _} <-
-           Client.delete(
+           ESClient.delete(
              config,
              {[index_name_or_alias, @type_name, doc_id], refresh: "wait_for"}
            ) do
