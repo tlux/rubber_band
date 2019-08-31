@@ -1,5 +1,5 @@
-defmodule RubberBand.Hits do
-  alias RubberBand.Hit
+defmodule Gum.Hits do
+  alias Gum.Hit
 
   defstruct max_score: 0.0, total: 0, entries: []
 

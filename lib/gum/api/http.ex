@@ -1,73 +1,79 @@
-defmodule RubberBand.Adapters.V5 do
-  @behaviour RubberBand.Adapter
+defmodule Gum.API.HTTP do
+  @behaviour Gum.API
 
-  alias RubberBand.Doc
-  alias RubberBand.GetResult
-  alias RubberBand.Hit
-  alias RubberBand.Hits
-  alias RubberBand.SearchResult
+  import Gum.Config, only: [fetch_index: 2]
 
-  @type_name "doc"
+  alias Gum.Doc
+  alias Gum.GetResult
+  alias Gum.Hit
+  alias Gum.Hits
+  alias Gum.SearchResult
 
   @impl true
-  def index_exists?(config, index_name) do
-    case ESClient.head(config, index_name) do
-      {:ok, %{status_code: 200}} -> true
+  def index_exists?(config, index) do
+    with {:ok, index_name, _store_mod} <- fetch_index(config, index),
+         {:ok, %{status_code: 200}} <- ESClient.head(config.client, index_name) do
+      true
+    else
       _ -> false
     end
   end
 
   @impl true
-  def create_index(config, index_name, index_alias, settings, mappings) do
-    with :ok <- drop_index(config, index_alias),
-         :ok <-
-           do_create_index(config, index_name, index_alias, settings, mappings) do
+  def create_index(config, index) do
+    with {:ok, index_alias, store_mod} <- fetch_index(config, index),
+         :ok <- drop_index(config, index_alias),
+         {:ok, _} <- do_create_index(config, index_alias, store_mod) do
       :ok
     end
   end
 
-  defp do_create_index(config, index_name, settings, mappings) do
-    do_create_index(config, index_name, index_name, settings, mappings)
-  end
+  defp do_create_index(config, index_alias, store_mod) do
+    index_name = generate_index_name(index_alias)
 
-  defp do_create_index(config, index_name, index_alias, settings, mappings) do
     opts = %{
-      settings: Map.put(settings, :"index.mapping.single_type", true),
-      mappings: %{@type_name => mappings},
+      settings: get_settings_opts(store_mod.settings(), config.type_name),
+      mappings: get_mappings_opts(store_mod.mappings(), config.type_name),
       aliases: get_alias_opts(index_name, index_alias)
     }
 
-    with {:ok, _} <- ESClient.put(config, index_name, opts), do: :ok
+    with {:ok, _} <- ESClient.put(config, index_name, opts) do
+      {:ok, index_name}
+    end
   end
+
+  defp get_settings_opts(settings, nil), do: settings
+
+  defp get_settings_opts(settings, _type_name) do
+    Map.put(settings, :"index.mapping.single_type", true)
+  end
+
+  defp get_mappings_opts(mappings, nil), do: mappings
+  defp get_mappings_opts(mappings, type_name), do: %{type_name => mappings}
 
   defp get_alias_opts(index_name, index_name), do: %{}
   defp get_alias_opts(_index_name, index_alias), do: %{index_alias => %{}}
 
+  defp generate_index_name(index_alias) do
+    timestamp = :os.system_time(:millisecond)
+    "#{index_alias}-#{timestamp}"
+  end
+
   @impl true
-  def create_and_populate_index(
-        config,
-        index_name,
-        index_alias,
-        settings,
-        mappings,
-        populate_fun
-      ) do
-    with :ok <- do_create_index(config, index_name, settings, mappings),
-         :ok <- populate_index(config, index_name, populate_fun),
+  def create_populated_index(config, index) do
+    with {:ok, index_alias, store_mod} <- fetch_index(config, index),
+         {:ok, index_name} <- do_create_index(config, index_alias, store_mod),
+         :ok <- populate_index(config, index_name, store_mod),
          :ok <- create_alias(config, index_name, index_alias) do
       :ok
     end
   end
 
-  defp populate_index(config, index_name, populate_fun) do
-    with {:error, error} <- populate_fun.() do
-      drop_index(config, index_name)
-      {:error, error}
-    end
-  rescue
-    error ->
-      drop_index(config, index_name)
-      reraise error, __STACKTRACE__
+  defp populate_index(config, index_name, store_mod) do
+    store_mod.populate_transaction(fn ->
+      nil
+      # store_mod.populate_stream
+    end)
   end
 
   defp create_alias(config, index_name, index_alias) do

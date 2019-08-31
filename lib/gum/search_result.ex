@@ -1,5 +1,5 @@
-defmodule RubberBand.SearchResult do
-  alias RubberBand.Hits
+defmodule Gum.SearchResult do
+  alias Gum.Hits
 
   defstruct [:hits, aggregations: %{}]
 

@@ -1,5 +1,5 @@
-defmodule RubberBand.BulkOperation do
-  alias RubberBand.Doc
+defmodule Gum.BulkOperation do
+  alias Gum.Doc
 
   defstruct [:action, :id, :source]
 

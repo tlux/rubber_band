@@ -1,10 +1,10 @@
-defmodule RubberBand.Stream do
+defmodule Gum.Stream do
   defstruct [:config, :index, search_opts: %{}]
 
   @type t :: %__MODULE__{
-          config: RubberBand.Config.t(),
-          index: RubberBand.index(),
-          search_opts: RubberBand.search_opts()
+          config: Gum.Config.t(),
+          index: Gum.index(),
+          search_opts: Gum.search_opts()
         }
 
   defimpl Collectable do

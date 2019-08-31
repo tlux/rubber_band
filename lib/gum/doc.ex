@@ -1,4 +1,4 @@
-defmodule RubberBand.Doc do
+defmodule Gum.Doc do
   defstruct [:id, :source]
 
   @type source :: %{optional(atom) => any}

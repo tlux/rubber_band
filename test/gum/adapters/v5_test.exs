@@ -1,12 +1,12 @@
-defmodule RubberBand.Adapters.V5Test do
+defmodule Gum.Adapters.V5Test do
   use ExUnit.Case, async: false
 
-  alias RubberBand.Adapters.V5
-  alias RubberBand.Config
-  alias RubberBand.Doc
-  alias RubberBand.GetResult
-  alias RubberBand.Hit
-  alias RubberBand.SearchResult
+  alias Gum.Adapters.V5
+  alias Gum.Config
+  alias Gum.Doc
+  alias Gum.GetResult
+  alias Gum.Hit
+  alias Gum.SearchResult
 
   @index_name "test-people"
 

@@ -1,5 +1,5 @@
-defmodule RubberBand.Hit do
-  alias RubberBand.Doc
+defmodule Gum.Hit do
+  alias Gum.Doc
 
   defstruct [:doc, score: 0.0]
 

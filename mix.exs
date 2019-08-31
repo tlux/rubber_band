@@ -1,11 +1,11 @@
-defmodule RubberBand.MixProject do
+defmodule Gum.MixProject do
   @moduledoc false
 
   use Mix.Project
 
   def project do
     [
-      app: :rubber_band,
+      app: :gum,
       version: "0.1.0",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
@@ -28,10 +28,9 @@ defmodule RubberBand.MixProject do
       dialyzer: [plt_add_apps: [:mix]],
 
       # Docs
-      name: "RubberBand",
-      source_url:
-        "https://github.com/tlux/rubber_band/blob/master/%{path}#L%{line}",
-      homepage_url: "https://github.com/tlux/rubber_band",
+      name: "Gum",
+      source_url: "https://github.com/tlux/gum/blob/master/%{path}#L%{line}",
+      homepage_url: "https://github.com/tlux/gum",
       docs: [
         main: "readme",
         extras: ["README.md"],

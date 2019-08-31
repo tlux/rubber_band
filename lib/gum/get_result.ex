@@ -1,5 +1,5 @@
-defmodule RubberBand.GetResult do
-  alias RubberBand.Doc
+defmodule Gum.GetResult do
+  alias Gum.Doc
 
   defstruct [:doc, :version]
 

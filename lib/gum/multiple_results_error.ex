@@ -1,4 +1,4 @@
-defmodule RubberBand.MultipleResultsError do
+defmodule Gum.MultipleResultsError do
   @moduledoc """
   An exception that is returned or raised when a find query returns more than
   one result.

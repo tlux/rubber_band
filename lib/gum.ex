@@ -1,8 +1,10 @@
-defmodule RubberBand do
+defmodule Gum do
   @moduledoc false
 
-  alias RubberBand.MultipleResultsError
-  alias RubberBand.UnknownIndexError
+  alias Gum.MultipleResultsError
+  alias Gum.UnknownIndexError
+
+  @type index_key :: atom
 
   @type error ::
           ESClient.error() | MultipleResultsError.t() | UnknownIndexError.t()

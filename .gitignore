@@ -20,7 +20,7 @@ erl_crash.dump
 *.ez
 
 # Ignore package tarball (built via "mix hex.build").
-rubber_band-*.tar
+gum-*.tar
 
 /.elixir_ls/
 .DS_Store
